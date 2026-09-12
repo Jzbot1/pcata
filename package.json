@@ -1,0 +1,17 @@
+{
+  "name": "zelan-store-workspace",
+  "version": "1.0.0",
+  "description": "Zelan Store Full Stack Application",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "npm run server --prefix backend",
+    "backend": "npm start --prefix backend",
+    "client": "npm start --prefix client",
+    "build": "npm run build --prefix client",
+    "install:all": "npm install --prefix backend && npm install --prefix client --legacy-peer-deps"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.1"
+  }
+}
