@@ -1,0 +1,205 @@
+.showreward {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  cursor: pointer;  
+}
+.user-reward {
+  width: 20%;
+  text-align: center;
+  padding: 20px;
+  border-radius: 10px;
+  background: var(--bg);
+}
+.user-reward h5 {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-color);
+}
+.user-reward h6 {
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 10px;
+  font-weight: bold;
+}
+.user-reward h6:nth-child(4) {
+  background-color: #000;
+  color: #f3f3f3;
+}
+.user-reward p {
+  color: var(--text-color);
+}
+.leaderboard-container {
+  padding: 100px 400px;
+  background: linear-gradient(180deg, #000000 20%, #ab0909);
+  color: var(--text-color);
+
+  min-height: 100vh;
+}
+.leaderboard-container .heading {
+  padding: 10px;
+  font-size: 18px;
+  text-align: center;
+  background: linear-gradient(to right, #e65252, #e65252);
+  border-radius: 10px;
+  color: #fff;
+}
+.leaderboard-container .items {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  background-color: #000;
+}
+.leaderboard-container .items p {
+  display: inline;
+}
+.leaderboard-container .items .icon {
+  margin-left: 5px;
+  transform: rotate(275deg);
+  color: var(--text-color);
+}
+.leaderboard-container .items span:nth-child(2) {
+  /* color: var(--t); */
+}
+.leaderboard-container .norecord {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  text-align: center;
+  padding: 10px;
+  border-radius: 15px;
+  margin-top: 20px;
+}
+.leaderboard-list {
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 15px;
+}
+.leaderboard-list .items {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: linear-gradient(to right, #ffbc9b, #f6ffc8);
+  box-shadow: 0 4px 10px rgba(255, 69, 0, 0.3);
+}
+.leaderboard-list .items:hover {
+  background: linear-gradient(to right, #f6ffc8, #ffbc9b);
+  .icon {
+    color: var(--text-color);
+  }
+}
+.winner {
+  width: 30% !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 14px;
+  cursor: pointer;
+}
+.winner img {
+  width: 50px;
+}
+.leaderboard-top-content {
+  align-items: center;
+  display: flex;
+  justify-content: start;
+  gap: 10px;
+}
+.leaderboard-top-content .box-1{
+  align-items: center;
+  border-radius: 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background-image: linear-gradient(180deg, #fff, #fff);
+}
+.leaderboard-top-content h2{
+  font-size: 18px;
+  font-weight: 700;
+  --bs-text-opacity: 1;
+  letter-spacing: -.6px;
+}
+
+.leaderboardbuttons {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+.leaderboardbuttons button {
+  outline: transparent;
+  background: linear-gradient(to right, #e0e0e0, #e0e0e0);
+  border: 2px solid #e0e0e0;
+  padding: 5px 20px;
+  border-radius: 10px;
+  width: 50%;
+  color: #000;
+}
+.leaderboardbuttons button.active {
+  color: #ffffff;
+  background: linear-gradient(to right, #e65252, #e65252);
+  border: 2px solid #e65252;
+}
+.leaderboard-rewards {
+  margin-top: 15px;
+}
+.winners {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  margin-top: 8px;
+  background: var(--btn);
+  border-radius: 5px;
+}
+.winners span {
+  padding: 5px 10px;
+  border-radius: 10px;
+  color: #fff;
+}
+.index-and-username span:nth-child(1) {
+  background-color: #fff;
+  color: #000;
+}
+
+@media screen and (max-width: 992px) {
+  .leaderboard-container {
+    padding: 20px;
+  }
+  .leaderboard-container .heading {
+    font-size: 15px;
+    font-weight: 600;
+    text-align: start;
+  }
+  .leaderboard-container .norecord h5 {
+    font-size: 15px;
+  }
+}
+@media screen and (max-width: 786px) {
+  .leaderboard-container .items p {
+    display: inline;
+    font-size: 14px;
+    text-align: center;
+  }
+  .leaderboard-container .items span {
+    font-weight: bold;
+  }
+  .user-reward {
+    width: 80%;
+  }
+}

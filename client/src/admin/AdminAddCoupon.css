@@ -1,0 +1,47 @@
+.admin-coupon-container {
+  background-color: #fff;
+  color: #333;
+  padding: 20px;
+}
+.admin-offer-btn-tabs {
+  margin-bottom: 20px;
+}
+.admin-offer-btn-tabs button {
+  padding: 10px 20px;
+  background-color: #eee;
+  outline: transparent;
+  border: transparent;
+}
+.admin-offer-btn-tabs button.active {
+  background-color: #ebef29;
+}
+.add-coupon-container,
+.shipping-charge {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+.coupons-container {
+  margin-top: 20px;
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+}
+.coupons-container .icon {
+  cursor: pointer;
+  scale: 1;
+  transition: 0.3s all ease;
+  &:hover {
+    color: red;
+    scale: 1.1;
+  }
+}
+.no-coupon {
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  width: 100%;
+}

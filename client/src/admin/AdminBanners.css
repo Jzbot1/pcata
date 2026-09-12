@@ -1,0 +1,12 @@
+.noti-container {
+    padding: 10px 10px;
+    background-color: #fff;
+    button {
+      padding: 8px 10px;
+      outline: transparent;
+      border: transparent;
+      background-color: #70b452;
+      color: #fff;
+    }
+  }
+  

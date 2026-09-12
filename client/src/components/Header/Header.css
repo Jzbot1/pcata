@@ -1,0 +1,255 @@
+.flat-offer {
+  background-color: #ebef29;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+.header {
+  position: relative !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
+}
+.header-main {
+  height: 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px;
+  position: relative;
+  width: 100%;
+  background-color: var(--p);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.889);
+}
+.logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 600;
+  font-size: 18px;
+}
+.logo span {
+  color: var(--t);
+}
+.menus ul {
+  height: 80px;
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  gap: 20px;
+}
+.menus li {
+  list-style: none;
+}
+.menus a {
+  text-decoration: none;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 400;
+}
+.action-btns {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+.action-btns .icon {
+  color: var(--t);
+  font-size: 25px;
+  cursor: pointer;
+}
+.login-btn {
+  padding: 5px 15px;
+  background-color: #fff;
+  color: var(--s);
+  font-weight: 500;
+  outline: transparent;
+  border: 0;
+  &:hover {
+    opacity: 0.8;
+  }
+}
+.request-btn {
+}
+.upgrade-btn {
+  padding: 10px;
+  background-color: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  outline: transparent;
+  margin: 0;
+}
+.help-menu {
+  border-right: 1px solid rgba(255, 255, 255, 0.4);
+  margin: 0 20px;
+}
+.menu-img {
+  border-radius: 100px;
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}
+.menu-img-container {
+  position: relative;
+}
+.img-hover-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #fff;
+}
+/* ================================== */
+.burger-icon .icon {
+  font-size: 40px;
+  cursor: pointer;
+  color: var(--t);
+}
+
+.sub-header {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+.sub-header ul {
+  height: 100%;
+  display: flex;
+  gap: 20px;
+  justify-content: start;
+  align-items: center;
+}
+.sub-header ul li {
+  width: 100%;
+  width: auto;
+}
+.sub-header ul li a {
+  color: #fff;
+  position: relative;
+}
+.sub-header a.active {
+  background-color: #eee;
+  padding: 5px;
+}
+
+/* ================================= LOGOUT TIPPY  */
+.logout-tippy {
+  width: 100%;
+  padding: 20px 10px;
+}
+.logout-tippy .icon {
+  font-size: 20px;
+  color: #000;
+  margin: 5px 0;
+}
+.section-1,
+.section-2,
+.section-3 {
+  cursor: pointer;
+}
+.section-2 {
+  padding-bottom: 10px;
+}
+.section-3 {
+  width: 100%;
+  text-align: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+  padding-top: 10px;
+}
+.section-3 button {
+  padding: 10px;
+  background-color: #26bd68;
+  color: #fff;
+  outline: transparent;
+  border: transparent;
+  margin-top: 10px;
+}
+.wallet-cont {
+  background-color: var(--s);
+  padding: 5px 10px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  cursor: pointer;
+}
+.wallet-cont .icon {
+  color: var(--t);
+}
+.logo img {
+  width: 150px;
+  border-radius: 5px;
+}
+
+/* ================================= LOGOUT TIPPY ENDS */
+
+/* ================================== */
+@media screen and (max-width: 1212px) {
+  .logo h3 {
+    font-size: 20px;
+  }
+  .menus ul li a {
+    font-size: 14px;
+    display: inline-block;
+  }
+}
+@media screen and (max-width: 1100px) {
+  .logo h3 {
+    font-size: 20px;
+  }
+  .logo p {
+    font-size: 12px;
+  }
+  .menus ul li a {
+    font-size: 12px;
+    display: inline-block;
+  }
+}
+@media screen and (max-width: 992px) {
+  .header-main {
+    padding: 0 20px;
+  }
+  .logo img {
+    width: 150px;
+  }
+  .logo h3 {
+    font-size: 25px;
+  }
+  .logo p {
+    font-size: 14px;
+    color: grey;
+    margin: 0;
+  }
+  .sub-header {
+    padding: 0 20px;
+    overflow-x: scroll;
+  }
+  .sub-header ul {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    display: flex;
+  }
+  .sub-header ul li {
+    width: auto;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .header-main {
+    padding: 0 10px;
+  }
+  .logo img {
+    width: 130px;
+  }
+
+  .logo {
+    font-size: 20px;
+  }
+  .action-btns {
+    gap: 5px;
+  }
+}

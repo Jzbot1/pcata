@@ -1,0 +1,31 @@
+.bg-heading {
+  padding: 40px 50px;
+  background-color: var(--p);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.bg-heading h4 {
+  font-size: 30px;
+  text-align: center;
+}
+.terms-container {
+  padding: 50px 200px;
+  background: var(--t);
+}
+.terms-container h5 {
+  color: #000;
+  font-weight: 600;
+  font-size: 16px;
+  position: relative;
+  text-transform: uppercase;
+}
+.terms-container p {
+  color: #333;
+}
+@media screen and (max-width: 992px) {
+  .terms-container {
+    padding: 50px 10px;
+  }
+}

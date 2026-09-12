@@ -1,0 +1,140 @@
+.hero-container {
+  padding: 50px 100px;
+  position: relative;
+}
+
+.hero-container img {
+  transition: 0.3s all ease-out;
+  border-radius: 15px;
+  height: 210px;
+  object-fit: cover;
+}
+
+.hero-container .slick-arrow {
+  display: none !important;
+}
+
+.hero-container img:hover {
+  scale: 1.02;
+}
+
+.hero-slider-btns .icon {
+  font-size: 45px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 100px;
+  border: 2px solid #fff;
+  background-color: #0000007f;
+  color: #fff;
+  padding: 5px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.hero-slider-btns .icon:hover {
+  background-color: #fff;
+  color: #000;
+}
+
+.hero-slider-btns .arrow-left {
+  left: 4%;
+}
+
+.hero-slider-btns .arrow-right {
+  right: 4%;
+}
+
+.banner-content {
+  position: relative;
+  display: block;
+}
+
+.banner-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5); /* Adding a background to the title */
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.banner-heading {
+  font-size: 18px;
+  color: #fff;
+  position: absolute;
+  bottom: 50px;
+  left: 20px;
+  z-index: 1;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
+  background: rgba(252, 62, 62, 0.5); /* Adding a background to the heading */
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.banner-img {
+  border: 3px solid rgba(255, 255, 255, 0.6);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 0px 8px 20px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.banner-img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.banner-link {
+  display: block;
+}
+
+@media screen and (max-width: 992px) {
+  .hero-container {
+    padding: 0;
+  }
+
+  .banner-title {
+    font-size: 20px;
+  }
+
+  .banner-heading {
+    font-size: 16px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .hero-container {
+    padding: 0;
+  }
+
+  .banner-title {
+    font-size: 18px;
+  }
+
+  .banner-heading {
+    font-size: 14px;
+  }
+  
+  .hero-slider-btns .icon {
+    top: 50px;
+  }
+
+  .hero-slider-btns .arrow-left {
+    left: 66% !important;
+  }
+  
+  .hero-slider-btns .arrow-right {
+    right: 8%;
+  }
+}
+@media screen and (max-width: 380px) {
+  .hero-slider-btns .arrow-left {
+    left: 60% !important;
+  }
+}

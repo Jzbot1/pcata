@@ -1,0 +1,17 @@
+.gallery-container {
+  background-color: #fff;
+  padding: 50px 20px;
+  .form-fields {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  button {
+    padding: 15px 20px;
+    outline: transparent;
+    border: transparent;
+    margin-top: 5px;
+    background-color: #000;
+    color: #fff;
+  }
+}

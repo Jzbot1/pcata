@@ -1,0 +1,240 @@
+.explore-products-container {
+  /* margin-top: 50px; */
+  padding: 70px 50px;
+  padding-left: 120px;
+  color: #fff;
+  /* background-color: var(--p); */
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 20px;
+}
+.popular-games {
+  width: 100%;
+  border-radius: 15px;
+}
+.titlee {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.titlee h2 {
+  font-weight: 500;
+  font-size: 40px;
+}
+.titlee span {
+  color: var(--t);
+}
+.game-cont {
+  padding: 15px;
+}
+.game {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #32393b;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  margin-top: 50px;
+  padding-top: 60px;
+  text-align: center;
+  min-height: 200px;
+}
+.game img {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 15px;
+  margin-top: -50px;
+}
+.game h5 {
+  font-size: 14px;
+  text-align: center;
+  font-weight: 600;
+}
+.game span {
+  font-size: 10px;
+  color: #ddd;
+}
+.buy-now {
+  background-color: var(--t);
+  outline: transparent;
+  border: transparent;
+  padding: 5px 30px;
+  font-size: 14px;
+  border-radius: 100px;
+  margin-top: 15px;
+}
+.buy-now .icon {
+  font-size: 14px;
+}
+.game-tabs {
+  display: flex;
+  gap: 15px;
+  font-size: 14px;
+}
+.game-tabs span {
+  color: #ddd;
+  cursor: pointer;
+}
+.game-tabs span.active {
+  color: var(--t);
+  position: relative;
+}
+.game-tabs span.active::before {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 2px;
+  background-color: var(--t);
+}
+
+.mobile-game-cont {
+  display: flex;
+  overflow-x: scroll;
+}
+
+/* ===================  */
+.explore-products-container .game-filter-tabs {
+  width: 100%;
+  padding: 0 20px;
+}
+.explore-products-container .game-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.explore-products-container .game-container .game-cont {
+  width: 200px;
+}
+
+@media screen and (max-width: 992px) {
+  .explore-products-container {
+    padding: 50px 20px;
+    flex-wrap: wrap;
+  }
+  .popular-games {
+    width: 100%;
+  }
+}
+@media screen and (max-width: 600px) {
+  .popular-games h5,
+  .popular-games span {
+    font-size: 15px;
+  }
+  .games-list {
+    gap: 20px;
+  }
+  .game h5 {
+    font-size: 12px;
+  }
+  .game span {
+    font-size: 10px;
+  }
+  .game-tabs {
+    font-size: 12px;
+  }
+  .explore-products-container .game-container .game-cont {
+    width: 150px;
+  }
+}
+@media screen and (max-width: 550px) {
+  .game {
+    padding-top: 35px;
+    min-height: 150px;
+  }
+  .game img {
+    width: 70px;
+    height: 70px;
+  }
+  .game h5 {
+    font-size: 10px;
+  }
+  .buy-now {
+    font-size: 10px;
+    margin-top: 0;
+  }
+  .game-tabs {
+    font-size: 12px;
+  }
+  .explore-products-container .game-container .game-cont {
+    width: 140px;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .explore-products-container {
+    padding: 50px 10px;
+    flex-wrap: wrap;
+    margin-top: 0;
+  }
+  .popular-games {
+    width: 100%;
+    padding: 10px 0px;
+    padding-left: 0;
+  }
+  .popular-games h2 {
+    font-size: 22px;
+    margin: 0;
+  }
+  .popular-games span {
+    font-size: 15px;
+  }
+  .popular-games .mobile-game-cont {
+    padding: 0px;
+  }
+  .game-cont {
+    width: 33%;
+    padding: 0;
+    margin: 0 5px;
+  }
+  .game img {
+    width: 50px;
+    height: 50px;
+    margin-top: -25px;
+  }
+  .game h5 {
+    font-size: 10px;
+  }
+  .game span {
+    font-size: 8px;
+  }
+  .buy-now {
+    padding: 5px 20px;
+    font-size: 12px;
+  }
+  .game-tabs {
+    font-size: 12px;
+  }
+  .explore-products-container .game-filter-tabs {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: scroll;
+  }
+  .explore-products-container .game-filter-tabs button {
+    width: 250px;
+    min-width: fit-content;
+  }
+  .explore-products-container .game-container {
+    margin-top: 0;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .game-tabs {
+    font-size: 10px;
+  }
+}

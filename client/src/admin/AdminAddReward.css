@@ -1,0 +1,16 @@
+.reward-container-list {
+    display: flex;
+    gap: 5px;
+    padding: 20px;
+    background-color: #fff;
+  }
+  .reward-container-list .form-fields input {
+    color: #000;
+  }
+  
+  @media screen and (max-width: 992px) {
+    .reward-container-list {
+      flex-direction: column;
+    }
+  }
+  

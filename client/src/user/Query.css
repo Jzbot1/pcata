@@ -1,0 +1,31 @@
+.query-reply-container {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.back-btnn {
+  cursor: pointer;
+  color: #000;
+}
+
+/* VIEW QUERY  */
+.view-query-container span {
+}
+.query-msg {
+  background-color: #000;
+  color: #fff;
+  margin-bottom: 10px;
+  padding: 10px;
+  align-self: flex-start;
+  width: 60%;
+}
+.query-msg.active {
+  align-self: flex-end;
+  background-color: var(--t);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  color: #000;
+}
+.view-btn {
+  color: #000;
+  padding: 5px;
+}

@@ -1,0 +1,22 @@
+.admin-queries {
+  background-color: #fff;
+  padding: 20px 10px;
+  color: #333;
+  overflow-x: scroll;
+}
+.admin-query-reply {
+  display: flex;
+  flex-direction: column;
+}
+.admin-query-reply .query-msg.user {
+  align-self: flex-start;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0px;
+}
+.admin-query-reply .query-msg.admin {
+  align-self: flex-end;
+  background-color: var(--t);
+  border-radius: 0px;
+  color: #000;
+}

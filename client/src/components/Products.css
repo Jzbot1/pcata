@@ -1,0 +1,223 @@
+.products-container {
+  padding: 100px;
+  border-top: 1px rgba(0, 0, 0, 0.3) !important;
+  color: #000;
+}
+.product-title h2 {
+  font-size: 50px;
+  color: var(--p);
+  font-weight: bold;
+}
+.product-title .icon {
+  color: var(--p);
+}
+.products {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* 6 columns on desktop */
+  gap: 30px;
+  margin-bottom: 20px;
+}
+.product {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.15);
+  border: 0px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.product:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.product img {
+  width: 100%;
+  aspect-ratio: 1/1;
+  transition: 0.2s all ease;
+  object-fit: cover;
+  border-radius: 12px;
+  scale: 1;
+}
+
+/* 🔲 Product Image Styling */
+.product-img-cont {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+/* 🖼️ Image Zoom on Hover */
+.product:hover img {
+  /* transform: scale(1.05); */
+  width: 100%;
+  aspect-ratio: 1/1;
+  transition: 0.2s all ease;
+  object-fit: cover;
+  border-radius: 10px;
+  scale: 1.05;
+}
+
+/* 📌 Product Name Styling */
+.product-name {
+  color: #fff;
+  text-align: center;
+  font-weight: 600;
+  font-size: 15px;
+  text-transform: capitalize;
+}
+
+/* 💲 Price Styling */
+.d-price {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffcc00;
+  margin-top: 5px;
+}
+
+.o-price {
+  font-size: 14px;
+  text-decoration: line-through;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.product-name {
+  color: #000;
+  text-align: center;
+  font-weight: 500;
+  font-size: 14px;
+}
+.product-name h6 {
+  font-weight: bold;
+  display: block;
+  word-break: break-word;
+}
+.d-price {
+  font-size: 15px;
+  font-weight: 600;
+  margin-right: 4px;
+}
+.o-price {
+  font-size: 14px;
+  text-decoration: line-through !important;
+  color: grey;
+}
+
+@media screen and (max-width: 992px) {
+  .products-container {
+    padding: 15px 15px;
+    justify-content: flex-start;
+  }
+  .products {
+    grid-template-columns: repeat(5, 1fr); /* 6 columns on desktop */
+    gap: 20px;
+  }
+  .product-img-cont {
+    width: 100%;
+    position: relative;
+  }
+  .product .discount {
+    bottom: 10px;
+    left: 10px;
+    padding: 0px 8px;
+  }
+  .product .discount span {
+    font-size: 10px;
+    font-weight: 800;
+  }
+  .product-name h6 {
+    font-size: 14px;
+  }
+  .product-title h2 {
+    font-size: 40px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .products {
+    grid-template-columns: repeat(3, 1fr); /* 6 columns on desktop */
+    gap: 20px;
+  }
+  .product-name {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .product-title h2 {
+    font-size: 30px;
+  }
+}
+
+@media screen and (max-width: 430px) {
+  .product-name {
+    font-size: 12px;
+    font-weight: 600;
+  }
+}
+
+.order-succcess-container {
+  padding: 100px 200px;
+  min-height: 100vh;
+  background: var(--bg);
+  color: #fff;
+}
+.order-succcess-container .heading {
+  background-color: #000;
+  color: #fff;
+  margin: 0;
+  padding: 20px 10px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+}
+.order-succcess-container .heading h5 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--t);
+}
+.order-succcess-container .heading .icon {
+  color: var(--t);
+  font-size: 35px;
+  animation: scaleAnimation 1.5s infinite;
+  margin-left: 10px;
+}
+
+@keyframes scaleAnimation {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+}
+.order-succcess-container button {
+  background-color: #fff;
+  color: #000;
+  outline: transparent;
+  border: transparent;
+  border-radius: 10px;
+  padding: 5px 10px;
+  font-size: 15px;
+  &:hover {
+    opacity: 0.8;
+  }
+}

@@ -1,0 +1,25 @@
+.user-dashboard {
+  display: flex;
+  gap: 20px;
+}
+.user-dashboard .dash-card {
+  background-color: var(--s);
+  color: #fff;
+}
+.user-dashboard .dash-card:hover {
+  background-color: var(--s);
+  opacity: 0.9;
+  color: #fff;
+}
+.user-dashboard span {
+  color: #fff;
+}
+.user-dashboard .icon {
+  color: var(--t);
+}
+/* =============== MEDIA QUERY ===============  */
+@media screen and (max-width: 992px) {
+  .user-dashboard {
+    flex-direction: column;
+  }
+}

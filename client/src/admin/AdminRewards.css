@@ -1,0 +1,82 @@
+.winner-container {
+  background-color: #fff;
+  padding: 20px;
+  color: #000;
+  border-radius: 10px;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.winner-container h5 {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.winner-container .winnerbox {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+  padding: 10px;
+  overflow-x: auto;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.winner-container .date {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.winner-container .winners table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.winner-container .winners th,
+.winner-container .winners td {
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 14px;
+  border-bottom: 1px solid #ccc;
+}
+
+.winner-container .winners th {
+  background-color: #eaeaea;
+  font-weight: 600;
+}
+
+.winner-container .winners tr:nth-child(even) {
+  background-color: #f4f4f4;
+}
+
+@media (max-width: 768px) {
+  .winner-container {
+    padding: 15px;
+  }
+
+  .winner-container .winners table {
+    min-width: 100%;
+    font-size: 13px;
+  }
+
+  .winner-container .winners th,
+  .winner-container .winners td {
+    padding: 6px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .winner-container .winners table {
+    font-size: 12px;
+  }
+
+  .winner-container .date {
+    font-size: 0.9rem;
+  }
+
+  .winner-container h5 {
+    font-size: 1rem;
+  }
+}

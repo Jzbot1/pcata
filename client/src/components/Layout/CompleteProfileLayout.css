@@ -1,0 +1,49 @@
+.complete-profile-header {
+  background-color: white;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+.mslogo {
+  color: #26bd68;
+  font-size: 30px;
+}
+.green-line {
+  background-color: #26bd68;
+  width: 100px;
+  height: 4px;
+  text-align: center;
+  display: block;
+  margin: 0 auto;
+}
+.c-profile-icon .icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+  background-color: #26bd68;
+  color: #fff;
+  border-radius: 100%;
+  padding: 15px;
+}
+.copyright {
+  width: 100%;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.copyright span {
+  font-size: 12px;
+  width: 50%;
+}
+.developer {
+  text-align: end;
+}
+@media screen and (max-width: 768px) {
+  .copyright span {
+    width: 100%;
+    text-align: center;
+    margin: 8px 0;
+  }
+}

@@ -1,0 +1,52 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
+
+:root {
+  --p: #000;
+  --s: #333;
+  --t: #dc3545;
+  --bg: linear-gradient(180deg, #dc3545 20%, #ab0909 100%);
+  --bg-button: linear-gradient(135deg, #a71423, #ff4d4d);
+}
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Lato", sans-serif;
+  list-style: none !important;
+  text-decoration: none !important;
+}
+ul {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.no-wrap {
+  white-space: nowrap;
+}
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.popp {
+  font-family: "Poppins", sans-serif !important;
+}
+.caveat {
+  font-family: "Caveat", cursive;
+  font-weight: 500;
+}
+
+@media screen and (min-width: 993px) {
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background: linear-gradient(#333, #000);
+  }
+}

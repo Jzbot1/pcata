@@ -1,0 +1,35 @@
+.main-home-container {
+  background: var(--bg);
+}
+.popup-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  img {
+    width: 50%;
+    display: block;
+    margin: 0 auto;
+    border: 2px solid #fff;
+  }
+  .icon {
+    font-size: 50px;
+    color: #fff;
+    cursor: pointer;
+  }
+}
+
+@media screen and (max-width: 786px) {
+  .popup-container {
+    img {
+      width: 80%;
+    }
+  }
+}

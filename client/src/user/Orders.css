@@ -1,0 +1,22 @@
+.user-order-container {
+}
+.no-order-found {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 40px;
+  background-color: #eee;
+  padding: 20px;
+}
+.order-list {
+}
+.view-btn {
+  padding: 2px 10px;
+  background-color: var(--t);
+  color: #fff;
+  outline: transparent;
+  border: transparent;
+}
+.loader-container {
+  height: 400px;
+}

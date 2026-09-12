@@ -1,0 +1,10 @@
+.support-container {
+  padding: 100px 200px;
+  background: linear-gradient(
+    180deg,
+    rgba(74, 39, 69, 1) 5%,
+    rgba(33, 32, 63, 1) 35%,
+    rgba(19, 27, 50, 1) 50%,
+    rgba(19, 27, 50, 1) 100%
+  );
+}

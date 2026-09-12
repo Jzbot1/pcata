@@ -1,0 +1,76 @@
+.admin-view-order-container {
+  padding: 50px 20px;
+  margin-top: 50px;
+  background-color: #fff;
+  color: #333;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 2%;
+}
+.admin-order-details-container {
+  width: 68%;
+  display: flex;
+  flex-direction: column;
+  background-color: #eee;
+  padding: 20px;
+}
+.admin-order-details {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.admin-order-general-details,
+.admin-order-shipping-details {
+  width: 50%;
+  padding: 20px 0;
+}
+.admin-order-item-details {
+  margin: 30px 0;
+}
+.admin-order-item {
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 20px;
+}
+.item-cost,
+.item-qty {
+  width: 25%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.item-img {
+  width: 25%;
+}
+.item-img img {
+  width: 50%;
+}
+.item-brand {
+  width: 25%;
+}
+.admin-order-actions {
+  padding: 20px;
+  background-color: #eee;
+  width: 30%;
+}
+.order-table .icon {
+  cursor: pointer;
+}
+.admin-order-total {
+  background-color: #fff;
+  padding: 20px;
+  gap: 0;
+}
+
+@media screen and (max-width: 992px) {
+  .admin-order-details-container {
+    width: 100%;
+  }
+  .admin-order-actions {
+    width: 100%;
+    margin-top: 10px;
+  }
+}

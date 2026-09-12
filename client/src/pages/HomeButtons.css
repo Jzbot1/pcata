@@ -1,0 +1,59 @@
+.mobile-buttons-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 10px 15px;
+    width: 100%;
+    gap: 20px;
+    background: linear-gradient(180deg, #ab0909  20%, #dc3545 100%);;
+  }
+  .mobile-buttons-container .buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 20%;
+  }
+  .mobile-buttons-container .buttons .iconcontainer {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--p);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 65px;
+    border-radius: 5px;
+    border-bottom: 2px solid #0000005a;
+    transition: 5s all ease;
+    background: var(--bg-button);
+  }
+  .mobile-buttons-container .buttons .iconcontainer:hover {
+    background: var(--bg);
+    opacity: 0.8;
+    .icon {
+      color: #fff;
+    }
+  }
+  .mobile-buttons-container .buttons .icon {
+    font-size: 30px;
+    color: #fff;
+  }
+  .mobile-buttons-container .buttons span {
+    color: #fff;
+    font-size: 12px;
+    margin-top: 5px;
+  }
+  .mobile-buttons-container .new-badge {
+    position: absolute;
+    top: -10px;
+    right: -4px;
+    background-color: #fff700;
+    color: #000;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 10;
+  }
+  

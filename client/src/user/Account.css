@@ -1,0 +1,17 @@
+.user-accout-details label {
+  color: #000;
+}
+.user-accout-details h6 {
+  color: #000;
+}
+.user-accout-details .form-fields {
+  padding: 20px;
+}
+.user-accout-details .pass-input {
+  background-color: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  color: #000;
+}
+.user-accout-details .pass-input::placeholder {
+  color: #333;
+}

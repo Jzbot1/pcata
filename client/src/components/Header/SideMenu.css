@@ -1,0 +1,85 @@
+.sidemenu-container {
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 70%;
+  height: 100vh;
+  transition: all 0.3s ease;
+  z-index: 99;
+}
+.sidemenu {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  padding-bottom: 200px;
+  position: relative;
+  background-color: #000;
+  padding: 60px 30px;
+}
+.sidemenu .close-icon {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 35px;
+  color: #fff;
+}
+.sidemenu ul li {
+  margin: 15px 0;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #ffbaba;
+  
+}
+.sidemenu ul li a{
+  color: black !important;
+}
+.sidemenu ul li.active {
+  background-color: var(--t);
+  a {
+    color: #ffffff !important;
+  }
+}
+.sidemenu ul li a {
+  color: #fff;
+  font-size: 16px;
+}
+.sidemenu .logout {
+  text-align: end;
+  color: #ebef29;
+  cursor: pointer;
+}
+.sidemenu .logout:hover {
+  color: #fff;
+}
+
+.sidemenu .logout .icon {
+  font-size: 25px;
+  margin-left: 5px;
+}
+.sidemenu-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 100px;
+  object-fit: cover;
+  border: 3px solid #26bd68;
+  display: block;
+  margin: 0 auto;
+}
+.active {
+  left: 0;
+}
+.sidemenu-action-btn a {
+  color: #fff;
+  text-decoration: underline !important;
+  margin-top: 40px !important;
+}
+/* @media screen and (max-width: 376px) {
+  .sidemenu-container {
+    width: 70%;
+  }
+  .sidemenu-action-btn .request-btn {
+    font-size: 12px;
+  }
+} */
