@@ -30,7 +30,7 @@ jobs:
             
             echo "📦 Installing client dependencies & building frontend..."
             npm install --prefix client --legacy-peer-deps
-            npm run build --prefix client
+            GENERATE_SOURCEMAP=false NODE_OPTIONS="--max-old-space-size=2048" npm run build --prefix client
             
             echo "🔄 Restarting application with PM2..."
             pm2 restart zelan-backend || pm2 start backend/server.js --name "zelan-backend"
