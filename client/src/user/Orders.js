@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { message } from "antd";
 import Layout from "../components/Layout/Layout";
 import DashboardLayout from "./components/DashboardLayout";
 import axios from "axios";
@@ -8,6 +9,7 @@ import "./Orders.css";
 
 const Orders = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useSelector((state) => state.user);
   const [allOrders, setAllOrders] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -37,9 +39,24 @@ const Orders = () => {
   };
 
   useEffect(() => {
+    const paymentStatus = searchParams.get("payment");
+    const orderId = searchParams.get("orderId");
+    if (paymentStatus === "success") {
+      message.success(
+        `Payment successful! Your order ${orderId ? `(#${orderId}) ` : ""}is placed.`
+      );
+    } else if (paymentStatus === "failed") {
+      message.error(
+        `Payment was not completed or failed. ${orderId ? `(Order: #${orderId})` : ""}`
+      );
+    } else if (paymentStatus === "error") {
+      message.error("An error occurred while verifying the order payment.");
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
     if (user !== null) {
       getAllUserOrders();
-      // getUSerOrderStatus();
     }
   }, [user]);
 

@@ -12,6 +12,8 @@ const walletHistoryModel = require("../models/walletHistoryModel");
 const userModel = require("../models/userModel");
 const generalRateLimiter = require("../middlewares/generalRateLimiter");
 const couponModel = require("../models/couponModel");
+const paymentGatewayService = require("../services/paymentGatewayService");
+const pendingPaymentModel = require("../models/pendingPaymentModel");
 const router = express.Router();
 
 const generateBasicAuthHeader = () => {
@@ -194,125 +196,168 @@ router.post("/create-order", generalRateLimiter, authMiddleware, async (req, res
       }
     }
 
-    const redirectUrl = `https://zelanstore.com/api/moogold/check-status`;
-    // const redirectUrl = `http://localhost:8080/api/smile/check-status`;
-    console.log(finalPrice)
-    const response = await axios.post(
-      "https://api.ekqr.in/api/create_order",
+    // Save pending payment record
+    await pendingPaymentModel.findOneAndUpdate(
+      { orderId: order_id.toString() },
       {
-        key: process.env.UPIGATEWAY_API_KEY,
-        client_txn_id: order_id.toString(),
-        amount: finalPrice.toString(),
-        p_info : gameId,
-        customer_name: finalCustomerName,
-        customer_email: customer_email,
-        customer_mobile : customer_mobile,
-        redirect_url: redirectUrl,
-        udf1: txn_note,
-        udf2: discountApplied > 0 ? `${couponName} - ${discountApplied}Rs` : "",
-        udf3: "",
-      }
+        $set: {
+          orderId: order_id.toString(),
+          type: "order",
+          apiName: "moogold",
+          amount: amount.toString(),
+          finalPrice: finalPrice,
+          customerName: finalCustomerName,
+          customerEmail: customer_email,
+          customerMobile: customer_mobile || "",
+          productName: pname,
+          userId: userId,
+          zoneId: zoneId,
+          productId: productId,
+          gameId: gameId,
+          gameName: gameId,
+          rawNote: txn_note,
+          couponId: couponId || "",
+          couponName: couponName || "",
+          discountApplied: discountApplied || 0,
+          status: "pending",
+        },
+      },
+      { upsert: true, new: true }
     );
 
-    console.log(response.data)
-    
-    if (!response || !response.data?.status) {
-      return res.status(201).send({ success: false, message: response.data.msg });
-    }
-    
-    if (response.data?.status) {
-      return res.status(200).send({ success: true, data: response.data.data });
+    const redirectUrl = `https://zelanstore.com/api/moogold/check-status`;
+
+    const result = await paymentGatewayService.createOrder({
+      orderId: order_id,
+      amount: finalPrice,
+      customerName: finalCustomerName,
+      customerEmail: customer_email,
+      customerMobile: customer_mobile,
+      redirectUrl,
+      note: txn_note,
+      remark1: txn_note,
+      remark2: discountApplied > 0 ? `${couponName} - ${discountApplied}Rs` : "",
+    });
+
+    console.log("[MOOGOLD_CREATE_ORDER_RESULT]:", result);
+
+    if (result.success && result.payment_url) {
+      return res.status(200).send({
+        success: true,
+        data: { payment_url: result.payment_url, ...result.data },
+      });
     } else {
-      return res
-        .status(201)
-        .send({ success: false, message: "Error in initiating payment" });
+      return res.status(201).send({
+        success: false,
+        message: result.message || "Error in initiating payment",
+      });
     }
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: error.message || error });
   }
 });
-router.get("/check-status", async (req, res) => {
-  try {
-    const { client_txn_id } = req.query;
 
-    if(!client_txn_id){
-      return res.status(400).json({ message: "transaction id not found" });
+router.all("/check-status", async (req, res) => {
+  try {
+    const query = req.query || {};
+    const body = req.body || {};
+
+    const effectiveOrderId = (
+      query.client_txn_id ||
+      query.order_id ||
+      query.orderId ||
+      query.txn_id ||
+      query.idtrx ||
+      body.client_txn_id ||
+      body.order_id ||
+      body.orderId ||
+      body.txn_id ||
+      body.idtrx ||
+      ""
+    ).toString();
+
+    if (!effectiveOrderId) {
+      return res.redirect("https://zelanstore.com/orders?payment=failed&msg=MissingOrderId");
     }
 
     // Check if order exists
-    if (await orderModel.findOne({ orderId: client_txn_id })) {
-      return res.redirect("https://zelanstore.com/orders");
-    }
-    // Check if payment history exists
-
-    if (await paymentModel.findOne({orderId: client_txn_id})) {
-      return res.redirect("https://zelanstore.com/orders");
+    if (await orderModel.findOne({ orderId: effectiveOrderId })) {
+      return res.redirect(`https://zelanstore.com/orders?payment=success&orderId=${effectiveOrderId}`);
     }
 
-    const formattedDate = new Date().toLocaleDateString("en-GB").split("/").join("-"); // Convert "27/02/2022" to "27-02-2022"
-    
-    // Check payment status
-    const paymentResponse = await axios.post("https://api.ekqr.in/api/check_order_status", {
-      key: process.env.UPIGATEWAY_API_KEY,
-      client_txn_id,
-      txn_date: formattedDate,
+    const pendingRecord = await pendingPaymentModel.findOne({
+      orderId: effectiveOrderId,
     });
 
-    // Check if the order ID is found
-    if (paymentResponse.data.status) {
-      const data = paymentResponse.data.data;
-      const {
+    const statusResult = await paymentGatewayService.checkOrderStatus({
+      orderId: effectiveOrderId,
+      client_txn_id: effectiveOrderId,
+    });
+
+    console.log("[MOOGOLD_STATUS_RESULT]:", statusResult);
+
+    if (statusResult.isSuccess) {
+      const data = statusResult.data || {};
+      const txn_amount =
+        parseFloat(statusResult.amount) ||
+        parseFloat(data.amount) ||
+        parseFloat(pendingRecord?.finalPrice) ||
+        0;
+
+      const utr_number =
+        statusResult.utr ||
+        data.upi_txn_id ||
+        data.utr ||
+        data.bank_ref_num ||
+        "none";
+
+      const customer_name =
+        pendingRecord?.customerName ||
+        data.customer_name ||
+        "Customer";
+
+      const customer_email =
+        pendingRecord?.customerEmail ||
+        data.customer_email ||
+        data.remark2 ||
+        "";
+
+      const customer_mobile =
+        pendingRecord?.customerMobile ||
+        data.customer_mobile ||
+        "";
+
+      const pname =
+        pendingRecord?.productName ||
+        data.p_info ||
+        "";
+
+      const userid = pendingRecord?.userId || "";
+      const zoneid = pendingRecord?.zoneId || "";
+      const productId = pendingRecord?.productId || "";
+      const amount = pendingRecord?.amount || "";
+      const gameName = pendingRecord?.gameId || pendingRecord?.gameName || "";
+      const discount = pendingRecord?.discountApplied > 0 ? `${pendingRecord.couponName} - ${pendingRecord.discountApplied}Rs` : "";
+
+      // Save Payment Record
+      await new paymentModel({
+        name: customer_name,
+        email: customer_email,
+        mobile: customer_mobile,
         amount: txn_amount,
-        client_txn_id: order_id,
-        customer_name,
-        customer_email,
-        customer_mobile,
-        p_info: gameName,
+        orderId: effectiveOrderId,
+        status: "success",
+        type: "order",
+        pname: pname,
         upi_txn_id: utr_number,
-        customer_vpa,
-        remark,
-        udf1,
-        udf2,
-      } = data;
+        payerUpi: data.customer_vpa || "none",
+      }).save();
 
-      const [userid, zoneid, productId, pname, amount, selectedPrice] = udf1.split("@");
+      let orderSuccess = false;
 
-      if (data.status === "success") {
-         // Save Payment Record
-         await new paymentModel({
-          name: customer_name,
-          email: customer_email,
-          mobile: customer_mobile,
-          amount: txn_amount,
-          orderId: order_id,
-          status: "success",
-          type: "order",
-          pname: pname,
-          upi_txn_id: utr_number || "none",
-          payerUpi: customer_vpa || "none",
-        }).save();
-
-        // Validate Product
-        const pp = await productModel.findOne({ name: pname });
-        if (!pp) {
-          return res.status(201).json({ message: "Product not found" });
-        }
-
-        //CROSS CHECK PACKAGE PRICE AND GAME ID
-        const priceExists = pp.cost.some((item) => {
-          return (
-            item.amount === amount &&
-            item.id === productId &&
-            (Number(item.price) === Number(selectedPrice) || Number(item.resPrice) === Number(selectedPrice))
-          );
-        });
-
-        if (!priceExists) {
-          return res.status(201).json({ message: "Amount does not match." });
-        }
-
-        //? GETTING FIELDS
+      // Attempt Moogold API call
+      try {
         const fieldsPayload = {
           path: "product/product_detail",
           product_id: gameName,
@@ -335,155 +380,130 @@ router.get("/check-status", async (req, res) => {
               auth: authSignaturee,
               timestamp: timestampp,
             },
+            timeout: 15000,
           }
         );
 
-        if (moogold.data.err_code) {
-          const order = new orderModel({
-            api: "yes",
-            amount: amount,
-            orderId: order_id,
-            p_info: pname,
-            price: txn_amount,
-            customer_email,
-            customer_mobile,
-            playerId: userid,
-            userId: userid,
-            zoneId: zoneid,
-            status: "failed",
-            paymentMode: "wallet",
-            ...(udf2 && { discount: udf2 }),
-          });
-          await order.save();
-          return res.status(201).send({ success: false, message: "Contact to Admin" });
-        }
-
-        //? GETTING FIELDS END
-
-        //! CREATE ORDER MOOGOLD
-        const payload = {
-          path: "order/create_order",
-          data: {
-            category: 1,
-            "product-id": productId,
-            quantity: 1,
-          },
-        };
-
-        moogold.data.fields.forEach((field, index) => {
-          if (index === 0) {
-            payload.data[field] = userid;
-          } else if (index === 1) {
-            payload.data[field] = zoneid;
-          }
-        });
-
-        const timestamp = Math.floor(Date.now() / 1000);
-        const path = "order/create_order";
-        const authSignature = generateAuthSignature(payload, timestamp, path);
-
-        console.log("Sending order creation request to Moogold...");
-
-        const response = await axios.post(
-          "https://moogold.com/wp-json/v1/api/order/create_order",
-          payload,
-          {
-            headers: {
-              Authorization: generateBasicAuthHeader(),
-              auth: authSignature,
-              timestamp: timestamp,
+        if (moogold.data && !moogold.data.err_code && Array.isArray(moogold.data.fields)) {
+          const payload = {
+            path: "order/create_order",
+            data: {
+              category: 1,
+              "product-id": productId,
+              quantity: 1,
             },
-          }
-        );
-       
-        console.log(response.data);
-
-        if (response.data.err_code) {
-          const order = new orderModel({
-            api: "yes",
-            amount: amount,
-            orderId: order_id,
-            p_info: pname,
-            price: txn_amount,
-            customer_email,
-            customer_mobile,
-            playerId: userid,
-            userId: userid,
-            zoneId: zoneid,
-            status: "failed",
-            paymentMode: "wallet",
-            ...(udf2 && { discount: udf2 }),
-          });
-          await order.save();
-          return res.status(201).send({ success: false, message: "Order Failed" });
-        }
-
-        console.log(response.data.order_id);
-
-
-        if (response.status) {
-          const order = new orderModel({
-            api: "yes",
-            amount: amount,
-            orderId: order_id,
-            p_info: pname,
-            price: txn_amount,
-            customer_email,
-            customer_mobile,
-            playerId: userid,
-            userId: userid,
-            zoneId: zoneid,
-            status: "success",
-            paymentMode: "wallet",
-            ...(udf2 && { discount: udf2 }),
-          });
-          await order.save();
-        }
-
-        try {
-          const dynamicData = {
-            orderId: `${order_id}`,
-            amount: `${amount}`,
-            price: `${txn_amount}`,
-            p_info: `${pname}`,
-            userId: `${userid}`,
-            zoneId: `${zoneid}`,
           };
-          let htmlContent = fs.readFileSync("order.html", "utf8");
-          Object.keys(dynamicData).forEach((key) => {
-            const placeholder = new RegExp(`{${key}}`, "g");
-            htmlContent = htmlContent.replace(placeholder, dynamicData[key]);
-          });
-          // Send mail
-          let mailTransporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-              user: process.env.MAIL,
-              pass: process.env.APP_PASSWORD,
-            },
-          });
-          let mailDetails = {
-            from: process.env.MAIL,
-            to: `${customer_email}`,
-            subject: "Order Successful!",
-            html: htmlContent,
-          };
-          mailTransporter.sendMail(mailDetails, function (err, data) {
-            if (err) {
-              console.log(err);
+
+          moogold.data.fields.forEach((field, index) => {
+            if (index === 0) {
+              payload.data[field] = userid;
+            } else if (index === 1) {
+              payload.data[field] = zoneid;
             }
           });
-        } catch (error) {
-          console.error("Error sending email:", error);
+
+          const timestamp = Math.floor(Date.now() / 1000);
+          const path = "order/create_order";
+          const authSignature = generateAuthSignature(payload, timestamp, path);
+
+          console.log("Sending order creation request to Moogold...");
+
+          const moogoldResponse = await axios.post(
+            "https://moogold.com/wp-json/v1/api/order/create_order",
+            payload,
+            {
+              headers: {
+                Authorization: generateBasicAuthHeader(),
+                auth: authSignature,
+                timestamp: timestamp,
+              },
+              timeout: 20000,
+            }
+          );
+
+          console.log("[MOOGOLD_ORDER_RES]:", moogoldResponse.data);
+          if (moogoldResponse.data && !moogoldResponse.data.err_code) {
+            orderSuccess = true;
+          }
         }
-        return res.redirect("https://zelanstore.com/user-dashboard");
-      } else {
-        console.error("OrderID Not Found");
-        return res.status(404).json({ error: "OrderID Not Found" });
+      } catch (mooErr) {
+        console.error("Moogold API processing error:", mooErr.response ? mooErr.response.data : mooErr.message);
       }
+
+      const orderData = {
+        api: "yes",
+        amount: amount,
+        orderId: effectiveOrderId,
+        p_info: pname,
+        price: txn_amount,
+        customer_email,
+        customer_mobile,
+        playerId: userid,
+        userId: userid,
+        zoneId: zoneid,
+        status: orderSuccess ? "success" : "pending",
+        paymentMode: "UPI",
+        ...(discount && { discount }),
+      };
+
+      await new orderModel(orderData).save();
+
+      if (pendingRecord) {
+        await pendingPaymentModel.updateOne(
+          { orderId: effectiveOrderId },
+          { $set: { status: "success" } }
+        );
+      }
+
+      try {
+        const dynamicData = {
+          orderId: `${effectiveOrderId}`,
+          amount: `${amount}`,
+          price: `${txn_amount}`,
+          p_info: `${pname}`,
+          userId: `${userid}`,
+          zoneId: `${zoneid}`,
+        };
+        let htmlContent = fs.readFileSync("order.html", "utf8");
+        Object.keys(dynamicData).forEach((key) => {
+          const placeholder = new RegExp(`{${key}}`, "g");
+          htmlContent = htmlContent.replace(placeholder, dynamicData[key]);
+        });
+        let mailTransporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: process.env.MAIL,
+            pass: process.env.APP_PASSWORD,
+          },
+        });
+        let mailDetails = {
+          from: process.env.MAIL,
+          to: `${customer_email}`,
+          subject: "Order Successful!",
+          html: htmlContent,
+        };
+        mailTransporter.sendMail(mailDetails, function (err, data) {
+          if (err) {
+            console.log(err);
+          }
+        });
+      } catch (error) {
+        console.error("Error sending email:", error);
+      }
+
+      return res.redirect(`https://zelanstore.com/orders?payment=success&orderId=${effectiveOrderId}`);
+    } else {
+      if (pendingRecord) {
+        await pendingPaymentModel.updateOne(
+          { orderId: effectiveOrderId },
+          { $set: { status: "failed" } }
+        );
+      }
+      return res.redirect(`https://zelanstore.com/orders?payment=failed&orderId=${effectiveOrderId}&status=${encodeURIComponent(statusResult.status || "FAILED")}`);
     }
   } catch (error) {
-    return res.status(500).json({ error: "Internal server error" });
+    console.error("Moogold check status error:", error);
+    return res.redirect("https://zelanstore.com/orders?payment=error");
   }
 });
 

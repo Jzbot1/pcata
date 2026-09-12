@@ -17,6 +17,10 @@ const qs = require("qs");
 const adminAuthMiddleware = require("../middlewares/adminAuthMiddleware");
 const generalRateLimiter = require("../middlewares/generalRateLimiter");
 const sendOrderEmail = require("../controllers/sendOrderEmail");
+const paymentGatewayService = require("../services/paymentGatewayService");
+const pendingPaymentModel = require("../models/pendingPaymentModel");
+const couponModel = require("../models/couponModel");
+
 
 router.post("/get-yokcash", browserMiddleware, async (req, res) => {
   try {
@@ -150,286 +154,259 @@ router.post("/create-order", generalRateLimiter, authMiddleware, async (req, res
       }
     }
 
-    const redirectUrl = `https://zelanstore.com/api/yok/check-status`;
-    // const redirectUrl = `http://localhost:8080/api/smile/check-status`;
-    
-    const response = await axios.post(
-      "https://api.ekqr.in/api/create_order",
+    // Save pending payment record
+    await pendingPaymentModel.findOneAndUpdate(
+      { orderId: order_id.toString() },
       {
-        key: process.env.UPIGATEWAY_API_KEY,
-        client_txn_id: order_id.toString(),
-        amount: finalPrice.toString(),
-        p_info : pname,
-        customer_name: finalCustomerName,
-        customer_email: customer_email,
-        customer_mobile : customer_mobile,
-        redirect_url: redirectUrl,
-        udf1: txn_note,
-        udf2: discountApplied > 0 ? `${couponName} - ${discountApplied}Rs` : "",
-        udf3: "",
-      }
+        $set: {
+          orderId: order_id.toString(),
+          type: "order",
+          apiName: "yokcash",
+          amount: amount.toString(),
+          finalPrice: finalPrice,
+          customerName: finalCustomerName,
+          customerEmail: customer_email,
+          customerMobile: customer_mobile || "",
+          productName: pname,
+          userId: userid,
+          zoneId: zoneid,
+          productId: productids,
+          rawNote: txn_note,
+          couponId: couponId || "",
+          couponName: couponName || "",
+          discountApplied: discountApplied || 0,
+          status: "pending",
+        },
+      },
+      { upsert: true, new: true }
     );
 
-    console.log(response.data)
+    const redirectUrl = `https://zelanstore.com/api/yok/check-status`;
 
-    if (!response || !response.data?.status) {
-      return res.status(201).send({ success: false, message: response.data.msg });
-    }
-    
-    if (response.data?.status) {
-      return res.status(200).send({ success: true, data: response.data.data });
+    const result = await paymentGatewayService.createOrder({
+      orderId: order_id,
+      amount: finalPrice,
+      customerName: finalCustomerName,
+      customerEmail: customer_email,
+      customerMobile: customer_mobile,
+      redirectUrl,
+      note: txn_note,
+      remark1: txn_note,
+      remark2: discountApplied > 0 ? `${couponName} - ${discountApplied}Rs` : "",
+    });
+
+    console.log("[YOKCASH_CREATE_ORDER_RESULT]:", result);
+
+    if (result.success && result.payment_url) {
+      return res.status(200).send({
+        success: true,
+        data: { payment_url: result.payment_url, ...result.data },
+      });
     } else {
-      return res
-        .status(201)
-        .send({ success: false, data: "Error in initiating payment" });
+      return res.status(201).send({
+        success: false,
+        data: result.message || "Error in initiating payment",
+      });
     }
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: error.message || error });
   }
 });
 
-// EX GATEWAY CHECK STATUS
-router.get("/check-status", async (req, res) => {
+// GATEWAY CHECK STATUS
+router.all("/check-status", async (req, res) => {
   try {
-    const { client_txn_id } = req.query;
-    
-    if(!client_txn_id){
-      return res.status(400).json({ message: "transaction id not found" });
+    const query = req.query || {};
+    const body = req.body || {};
+
+    const effectiveOrderId = (
+      query.client_txn_id ||
+      query.order_id ||
+      query.orderId ||
+      query.txn_id ||
+      query.idtrx ||
+      body.client_txn_id ||
+      body.order_id ||
+      body.orderId ||
+      body.txn_id ||
+      body.idtrx ||
+      ""
+    ).toString();
+
+    if (!effectiveOrderId) {
+      return res.redirect("https://zelanstore.com/orders?payment=failed&msg=MissingOrderId");
     }
 
     // Check if order exists
-    if (await orderModel.findOne({ orderId: client_txn_id })) {
-      return res.redirect("https://zelanstore.com/orders");
+    if (await orderModel.findOne({ orderId: effectiveOrderId })) {
+      return res.redirect(`https://zelanstore.com/orders?payment=success&orderId=${effectiveOrderId}`);
     }
 
-    // Check if payment exists
-    if (await paymentModel.findOne({ orderId: client_txn_id })) {
-      return res.redirect("https://zelanstore.com/orders");
-    }
-
-    const formattedDate = new Date().toLocaleDateString("en-GB").split("/").join("-");
-    
-    // Check payment status
-    const paymentResponse = await axios.post("https://api.ekqr.in/api/check_order_status", {
-      key: process.env.UPIGATEWAY_API_KEY,
-      client_txn_id,
-      txn_date: formattedDate,
+    const pendingRecord = await pendingPaymentModel.findOne({
+      orderId: effectiveOrderId,
     });
-    
-    // Check if the order ID is found
-    if (paymentResponse.data.status) {
-      const data = paymentResponse.data.data;
-      const {
+
+    const statusResult = await paymentGatewayService.checkOrderStatus({
+      orderId: effectiveOrderId,
+      client_txn_id: effectiveOrderId,
+    });
+
+    console.log("[YOKCASH_STATUS_RESULT]:", statusResult);
+
+    if (statusResult.isSuccess) {
+      const data = statusResult.data || {};
+      const txn_amount =
+        parseFloat(statusResult.amount) ||
+        parseFloat(data.amount) ||
+        parseFloat(pendingRecord?.finalPrice) ||
+        0;
+
+      const utr_number =
+        statusResult.utr ||
+        data.upi_txn_id ||
+        data.utr ||
+        data.bank_ref_num ||
+        "none";
+
+      const customer_name =
+        pendingRecord?.customerName ||
+        data.customer_name ||
+        "Customer";
+
+      const customer_email =
+        pendingRecord?.customerEmail ||
+        data.customer_email ||
+        data.remark2 ||
+        "";
+
+      const customer_mobile =
+        pendingRecord?.customerMobile ||
+        data.customer_mobile ||
+        "";
+
+      const pname =
+        pendingRecord?.productName ||
+        data.p_info ||
+        "";
+
+      const userid = pendingRecord?.userId || "";
+      const zoneid = pendingRecord?.zoneId || "";
+      const productids = pendingRecord?.productId || "";
+      const amount = pendingRecord?.amount || "";
+      const discount = pendingRecord?.discountApplied > 0 ? `${pendingRecord.couponName} - ${pendingRecord.discountApplied}Rs` : "";
+
+      // Save Payment Record
+      await new paymentModel({
+        name: customer_name,
+        email: customer_email,
+        mobile: customer_mobile,
         amount: txn_amount,
-        client_txn_id: order_id,
-        customer_name,
-        customer_email,
-        customer_mobile,
-        p_info: product_name,
+        orderId: effectiveOrderId,
+        status: "success",
+        type: "order",
+        pname: pname,
         upi_txn_id: utr_number,
-        customer_vpa,
-        remark,
-        udf1,
-        udf2,
-      } = data;
+        payerUpi: data.customer_vpa || "none",
+      }).save();
 
-      const [userid, zoneid, productids, pname, amount, selectedPrice] = udf1.split("@");
+      let yokcashOrderId = "";
+      let yokcashStatus = "pending";
 
-      if (data.status === "success") {
-        // Save Payment Record
-        await new paymentModel({
-          name: customer_name,
-          email: customer_email,
-          mobile: customer_mobile,
-          amount: txn_amount,
-          orderId: order_id,
-          status: "success",
-          type: "order",
-          pname: pname,
-          upi_txn_id: utr_number || "none",
-          payerUpi: customer_vpa || "none",
-        }).save();
-
-        // Validate Product
-        const pp = await productModel.findOne({ name: pname });
-        if (!pp) {
-          return res.status(201).json({ message: "Product not found" });
-        }
-
-        //CROSS CHECK PACKAGE PRICE AND GAME ID
-        const priceExists = pp.cost.some((item) => {
-          return (
-            item.amount === amount &&
-            item.id === productids &&
-            (Number(item.price) === Number(selectedPrice) || Number(item.resPrice) === Number(selectedPrice))
-          );
-        });
-
-        if (!priceExists) {
-          return res.status(201).json({ message: "Amount does not match." });
-        }
-
+      try {
         const API_KEY = process.env.YOKCASH_API;
         const url = "https://api.yokcash.com/order";
-        const productid = productids.split("&");
+        const productidArr = productids.split("&");
 
-        let response;
-
-        for (let i = 0; i < productid.length; i++) {
-          const uniqueOrderId = `${order_id}-${i}`;
+        for (let i = 0; i < productidArr.length; i++) {
+          const uniqueOrderId = `${effectiveOrderId}-${i}`;
 
           const resp = await axios.post(
             url,
             {
               api_key: API_KEY,
-              service_id: productid[i],
-              target: zoneid !== "none" ? `${userid}|${zoneid}` : userid,
-              kontak: customer_mobile,
+              service_id: productidArr[i],
+              target: zoneid && zoneid !== "none" ? `${userid}|${zoneid}` : userid,
+              kontak: customer_mobile || "9999999999",
               idtrx: uniqueOrderId,
-              callback: "https://yourwebsite.com/callback/yokcash" // Optional
             },
             {
               headers: {
                 "Content-Type": "application/json",
               },
+              timeout: 15000,
             }
           );
 
-          response = resp.data;
+          if (resp.data && resp.data.data) {
+            yokcashOrderId = resp.data.data.id || "";
+            if (resp.data.status) {
+              yokcashStatus =
+                resp.data.data.status &&
+                resp.data.data.status.toLowerCase() === "processing"
+                  ? "pending"
+                  : resp.data.data.status || "success";
+            }
+          }
         }
-
-        if (!response.status) {
-          const orderData = {
-            api: "yes",
-            apiName: "yokcash",
-            amount: amount,
-            orderId: order_id,
-            p_info: pname,
-            price: txn_amount,
-            customer_email,
-            customer_mobile,
-            playerId: userid,
-            userId: userid,
-            zoneId: zoneid,
-            status: "failed",
-            paymentMode: "UPI",
-            ...(udf2 && { discount: udf2 }), // Add Discount Key Only If Discount Applied
-          };
-  
-          // Save Order
-          await new orderModel(orderData).save();
-
-          console.error("Error placing order:", response.data.msg);
-
-          return res.status(500).send(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <title>Server Error</title>
-              <style>
-                body {
-                  margin: 0;
-                  padding: 0;
-                  font-family: 'Arial', sans-serif;
-                  background: #f4f6ff;
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
-                  height: 100vh;
-                }
-
-                .container {
-                  background: white;
-                  padding: 40px;
-                  border-radius: 12px;
-                  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-                  text-align: center;
-                  max-width: 450px;
-                }
-
-                h1 {
-                  color: #e63946;
-                  font-size: 48px;
-                  margin: 0;
-                }
-
-                p {
-                  color: #555;
-                  margin: 15px 0 25px 0;
-                }
-
-                a {
-                  text-decoration: none;
-                  background: #4f46e5;
-                  color: white;
-                  padding: 10px 18px;
-                  border-radius: 6px;
-                  font-weight: 600;
-                  display: inline-block;
-                }
-
-                a:hover {
-                  background: #4338ca;
-                }
-
-                .emoji {
-                  font-size: 50px;
-                  margin-bottom: 10px;
-                }
-              </style>
-            </head>
-            <body>
-              <div class="container">
-                <div class="emoji">⚠️</div>
-                <h1>500</h1>
-                <h3>Server Error</h3>
-                <p>Sorry, there was a problem while placing your order.</p>
-                <a href="/">Go Back Home</a>
-              </div>
-            </body>
-            </html>
-          `);
-        }
-
-        const yokcashStatus =
-          response.data.status && response.data.status.toLowerCase() === "processing"
-            ? "pending"
-            : response.data.status;
-
-        const order = new orderModel({
-          api: "yes",
-          apiName: "yokcash",
-          amount: amount, 
-          orderId: order_id,
-          p_info: pname,
-          price: txn_amount,
-          status: yokcashStatus || "pending",
-          yid: response.data.id,
-          customer_email,
-          customer_mobile,
-          playerId: userid,
-          userId: userid,
-          zoneId: zoneid,
-          paymentMode: "UPI",
-          ...(udf2 && { discount: udf2 }), 
-        }).save();
-
-        // Send Order Email
-        if (yokcashStatus) {
-          const orderDetails = { orderId: order_id, amount, price: txn_amount, pname, userid, zoneid };
-          sendOrderEmail(orderDetails, customer_email);
-          return res.redirect("https://zelanstore.com/user-dashboard");
-        }
-        
-      } else {
-        console.error("OrderID Not Found");
-        return res.status(404).json({ error: "OrderID Not Found" });
+      } catch (yokErr) {
+        console.error("Yokcash API error:", yokErr.response ? yokErr.response.data : yokErr.message);
       }
+
+      const orderData = {
+        api: "yes",
+        apiName: "yokcash",
+        amount: amount,
+        orderId: effectiveOrderId,
+        p_info: pname,
+        price: txn_amount,
+        status: yokcashStatus || "pending",
+        yid: yokcashOrderId,
+        customer_email,
+        customer_mobile,
+        playerId: userid,
+        userId: userid,
+        zoneId: zoneid,
+        paymentMode: "UPI",
+        ...(discount && { discount }),
+      };
+
+      await new orderModel(orderData).save();
+
+      if (pendingRecord) {
+        await pendingPaymentModel.updateOne(
+          { orderId: effectiveOrderId },
+          { $set: { status: "success" } }
+        );
+      }
+
+      try {
+        const orderDetails = {
+          orderId: effectiveOrderId,
+          amount,
+          price: txn_amount,
+          pname,
+          userid,
+          zoneid,
+        };
+        sendOrderEmail(orderDetails, customer_email);
+      } catch (mailErr) {
+        console.error("Mail send error:", mailErr);
+      }
+
+      return res.redirect(`https://zelanstore.com/orders?payment=success&orderId=${effectiveOrderId}`);
+    } else {
+      if (pendingRecord) {
+        await pendingPaymentModel.updateOne(
+          { orderId: effectiveOrderId },
+          { $set: { status: "failed" } }
+        );
+      }
+      return res.redirect(`https://zelanstore.com/orders?payment=failed&orderId=${effectiveOrderId}&status=${encodeURIComponent(statusResult.status || "FAILED")}`);
     }
   } catch (error) {
-    console.error("Internal Server Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("Yokcash check status error:", error);
+    return res.redirect("https://zelanstore.com/orders?payment=error");
   }
 });
 

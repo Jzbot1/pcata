@@ -13,6 +13,8 @@ const walletHistoryModel = require("../models/walletHistoryModel");
 const userModel = require("../models/userModel");
 const couponModel = require("../models/couponModel");
 const sendOrderEmail = require("../controllers/sendOrderEmail");
+const paymentGatewayService = require("../services/paymentGatewayService");
+const pendingPaymentModel = require("../models/pendingPaymentModel");
 const router = express.Router();
 
 // UPI_GATEWAY
@@ -87,133 +89,175 @@ router.post("/create-order", generalRateLimiter, authMiddleware, async (req, res
       }
     }
 
-    const redirectUrl = `https://zelanstore.com/api/smile/check-status`;
-    // const redirectUrl = `http://localhost:8080/api/smile/check-status`;
-    
-    const response = await axios.post(
-      "https://api.ekqr.in/api/create_order",
+    // Save pending payment record
+    await pendingPaymentModel.findOneAndUpdate(
+      { orderId: order_id.toString() },
       {
-        key: process.env.UPIGATEWAY_API_KEY,
-        client_txn_id: order_id.toString(),
-        amount: finalPrice.toString(),
-        p_info : product_name,
-        customer_name: finalCustomerName,
-        customer_email: customer_email,
-        customer_mobile : customer_mobile,
-        redirect_url: redirectUrl,
-        udf1: txn_note,
-        udf2: discountApplied > 0 ? `${couponName} - ${discountApplied}Rs` : "",
-        udf3: "",
-      }
+        $set: {
+          orderId: order_id.toString(),
+          type: "order",
+          apiName: "smileOne",
+          amount: amount.toString(),
+          finalPrice: finalPrice,
+          customerName: finalCustomerName,
+          customerEmail: customer_email,
+          customerMobile: customer_mobile || "",
+          productName: product_name,
+          userId: userid,
+          zoneId: zoneid,
+          productId: productid,
+          region: product_name,
+          rawNote: txn_note,
+          couponId: couponId || "",
+          couponName: couponName || "",
+          discountApplied: discountApplied || 0,
+          status: "pending",
+        },
+      },
+      { upsert: true, new: true }
     );
 
-    console.log(response.data)
+    const redirectUrl = `https://zelanstore.com/api/smile/check-status`;
 
-    if (!response || !response.data?.status) {
-      return res.status(201).send({ success: false, message: response.data.msg });
-    }
-    
-    if (response.data?.status) {
-      return res.status(200).send({ success: true, data: response.data.data });
+    const result = await paymentGatewayService.createOrder({
+      orderId: order_id,
+      amount: finalPrice,
+      customerName: finalCustomerName,
+      customerEmail: customer_email,
+      customerMobile: customer_mobile,
+      redirectUrl,
+      note: txn_note,
+      remark1: txn_note,
+      remark2: discountApplied > 0 ? `${couponName} - ${discountApplied}Rs` : "",
+    });
+
+    console.log("[SMILE_CREATE_ORDER_RESULT]:", result);
+
+    if (result.success && result.payment_url) {
+      return res.status(200).send({
+        success: true,
+        data: { payment_url: result.payment_url, ...result.data },
+      });
     } else {
-      return res
-        .status(201)
-        .send({ success: false, data: "Error in initiating payment" });
+      return res.status(201).send({
+        success: false,
+        data: result.message || "Error in initiating payment",
+      });
     }
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: error.message || error });
   }
 });
 
-router.get("/check-status", generalRateLimiter, async (req, res) => {
+router.all("/check-status", generalRateLimiter, async (req, res) => {
   try {
-    const { client_txn_id } = req.query;
+    const query = req.query || {};
+    const body = req.body || {};
 
-    if(!client_txn_id){
-      return res.status(400).json({ message: "transaction id not found" });
+    const effectiveOrderId = (
+      query.client_txn_id ||
+      query.order_id ||
+      query.orderId ||
+      query.txn_id ||
+      query.idtrx ||
+      body.client_txn_id ||
+      body.order_id ||
+      body.orderId ||
+      body.txn_id ||
+      body.idtrx ||
+      ""
+    ).toString();
+
+    if (!effectiveOrderId) {
+      return res.redirect("https://zelanstore.com/orders?payment=failed&msg=MissingOrderId");
     }
 
     // Check if order exists
-    if (await orderModel.findOne({ orderId: client_txn_id })) {
-      return res.redirect("https://zelanstore.com/orders");
+    if (await orderModel.findOne({ orderId: effectiveOrderId })) {
+      return res.redirect(`https://zelanstore.com/orders?payment=success&orderId=${effectiveOrderId}`);
     }
 
-    // Check if payment exists
-    if (await paymentModel.findOne({ orderId: client_txn_id })) {
-      return res.redirect("https://zelanstore.com/orders");
-    }
-
-    const formattedDate = new Date().toLocaleDateString("en-GB").split("/").join("-"); // Convert "27/02/2022" to "27-02-2022"
-
-    // Check payment status
-    const paymentResponse = await axios.post("https://api.ekqr.in/api/check_order_status", {
-      key: process.env.UPIGATEWAY_API_KEY,
-      client_txn_id,
-      txn_date: formattedDate,
+    const pendingRecord = await pendingPaymentModel.findOne({
+      orderId: effectiveOrderId,
     });
 
-    // Check if the order ID is found
-    if (paymentResponse.data.status) {
-      const data = paymentResponse.data.data;
-      const {
+    const statusResult = await paymentGatewayService.checkOrderStatus({
+      orderId: effectiveOrderId,
+      client_txn_id: effectiveOrderId,
+    });
+
+    console.log("[SMILE_STATUS_RESULT]:", statusResult);
+
+    if (statusResult.isSuccess) {
+      const data = statusResult.data || {};
+      const txn_amount =
+        parseFloat(statusResult.amount) ||
+        parseFloat(data.amount) ||
+        parseFloat(pendingRecord?.finalPrice) ||
+        0;
+
+      const utr_number =
+        statusResult.utr ||
+        data.upi_txn_id ||
+        data.utr ||
+        data.bank_ref_num ||
+        "none";
+
+      const customer_name =
+        pendingRecord?.customerName ||
+        data.customer_name ||
+        "Customer";
+
+      const customer_email =
+        pendingRecord?.customerEmail ||
+        data.customer_email ||
+        data.remark2 ||
+        "";
+
+      const customer_mobile =
+        pendingRecord?.customerMobile ||
+        data.customer_mobile ||
+        "";
+
+      const pname =
+        pendingRecord?.productName ||
+        data.p_info ||
+        "";
+
+      const userid = pendingRecord?.userId || "";
+      const zoneid = pendingRecord?.zoneId || "";
+      const productids = pendingRecord?.productId || "";
+      const amount = pendingRecord?.amount || "";
+      const region = pendingRecord?.region || data.p_info || "philliphines";
+      const discount = pendingRecord?.discountApplied > 0 ? `${pendingRecord.couponName} - ${pendingRecord.discountApplied}Rs` : "";
+
+      // Save Payment Record
+      await new paymentModel({
+        name: customer_name,
+        email: customer_email,
+        mobile: customer_mobile,
         amount: txn_amount,
-        client_txn_id: order_id,
-        customer_name,
-        customer_email,
-        customer_mobile,
-        p_info: region,
+        orderId: effectiveOrderId,
+        status: "success",
+        type: "order",
+        pname: pname,
         upi_txn_id: utr_number,
-        customer_vpa,
-        remark,
-        udf1,
-        udf2,
-      } = data;
+        payerUpi: data.customer_vpa || "none",
+      }).save();
 
-      const [userid, zoneid, productids, pname, amount, selectedPrice] = udf1.split("@");
+      let orderSuccess = false;
 
-      if (data.status === "success") {
-        // Save Payment Record
-        await new paymentModel({
-          name: customer_name,
-          email: customer_email,
-          mobile: customer_mobile,
-          amount: txn_amount,
-          orderId: order_id,
-          status: "success",
-          type: "order",
-          pname: pname,
-          upi_txn_id: utr_number || "none",
-          payerUpi: customer_vpa || "none",
-        }).save();
-
-        // Validate Product
-        const pp = await productModel.findOne({ name: pname });
-        if (!pp) {
-          return res.status(201).json({ message: "Product not found" });
-        }
-
-        //CROSS CHECK PACKAGE PRICE AND GAME ID
-        const priceExists = pp.cost.some((item) => {
-          return (
-            item.amount === amount &&
-            item.id === productids &&
-            (Number(item.price) === Number(selectedPrice) || Number(item.resPrice) === Number(selectedPrice))
-          );
-        });
-
-        if (!priceExists) {
-          return res.status(201).json({ message: "Amount does not match." });
-        }
-
+      // Attempt Smile.one API call
+      try {
         const uid = process.env.UID;
         const email = process.env.EMAIL;
         const product = "mobilelegends";
         const time = Math.floor(Date.now() / 1000);
         const mKey = process.env.KEY;
-        const productid = productids.split("&");
+        const productidArr = productids.split("&");
 
-        const apiRequests = productid.map(async (id) => {
+        const apiRequests = productidArr.map(async (id) => {
           const signArr = {
             uid,
             email,
@@ -223,14 +267,18 @@ router.get("/check-status", generalRateLimiter, async (req, res) => {
             zoneid,
             productid: id,
           };
-    
+
           const sortedSignArr = Object.fromEntries(
             Object.entries(signArr).sort()
           );
-          const str = Object.keys(sortedSignArr).map((key) => `${key}=${sortedSignArr[key]}`).join("&") + "&" + mKey;
-          // const signStr = `uid=${uid}&email=${email}&product=${product}&time=${time}&userid=${userid}&zoneid=${zoneid}&productid=${id}&${mKey}`;
+          const str =
+            Object.keys(sortedSignArr)
+              .map((key) => `${key}=${sortedSignArr[key]}`)
+              .join("&") +
+            "&" +
+            mKey;
           const sign = md5(md5(str));
-    
+
           const formData = querystring.stringify({
             email,
             uid,
@@ -241,58 +289,80 @@ router.get("/check-status", generalRateLimiter, async (req, res) => {
             time,
             sign,
           });
-    
-          const apiUrl = `https://www.smile.one/${region === "brazil" ? "br" : "ph"}/smilecoin/api/createorder`;
-          return axios.post(apiUrl, formData, { headers: { "Content-Type": "application/x-www-form-urlencoded" } });
+
+          const apiUrl = `https://www.smile.one/${
+            region === "brazil" ? "br" : "ph"
+          }/smilecoin/api/createorder`;
+
+          return axios.post(apiUrl, formData, {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            timeout: 15000,
+          });
         });
 
-        // Wait for all API calls to complete
         const responses = await Promise.all(apiRequests);
-        const orderSuccess = responses.every((res) => res.data.status === 200);
-
-        console.log(responses.map((r) => r.data));
-
-        // Save Order Details
-        const orderStatus = orderSuccess ? "success" : "failed";
-
-        // Prepare Order Data
-        const orderData = {
-          api: "yes",
-          amount,
-          orderId: order_id,
-          p_info: pname,
-          price: txn_amount,
-          customer_email,
-          customer_mobile,
-          playerId: userid,
-          userId: userid,
-          zoneId: zoneid,
-          status: orderStatus,
-          paymentMode: "UPI",
-          ...(udf2 && { discount: udf2 }), // Add Discount Key Only If Discount Applied
-        };
-
-        // Save Order
-        await new orderModel(orderData).save();
-
-        // Send Order Email (only if successful)
-        if (orderSuccess) {
-          const orderDetails = { orderId: order_id, amount, price: txn_amount, pname, userid, zoneid };
-          sendOrderEmail(orderDetails, customer_email);
-          return res.redirect("https://zelanstore.com/user-dashboard");
-        }
-
-        console.error("Error placing order:", responses?.data?.message);
-        return res.status(500).json({ error: "Error placing order" });   
-
-      } else {
-        console.error("OrderID Not Found");
-        return res.status(404).json({ error: "OrderID Not Found" });
+        orderSuccess = responses.every((r) => r.data && r.data.status === 200);
+        console.log("[SMILE_API_RESPONSES]:", responses.map((r) => r.data));
+      } catch (smileErr) {
+        console.error("Smile.one API processing error:", smileErr.response ? smileErr.response.data : smileErr.message);
       }
+
+      const orderData = {
+        api: "yes",
+        amount,
+        orderId: effectiveOrderId,
+        p_info: pname,
+        price: txn_amount,
+        customer_email,
+        customer_mobile,
+        playerId: userid,
+        userId: userid,
+        zoneId: zoneid,
+        status: orderSuccess ? "success" : "pending",
+        paymentMode: "UPI",
+        ...(discount && { discount }),
+      };
+
+      await new orderModel(orderData).save();
+
+      if (pendingRecord) {
+        await pendingPaymentModel.updateOne(
+          { orderId: effectiveOrderId },
+          { $set: { status: "success" } }
+        );
+      }
+
+      if (orderSuccess) {
+        try {
+          const orderDetails = {
+            orderId: effectiveOrderId,
+            amount,
+            price: txn_amount,
+            pname,
+            userid,
+            zoneid,
+          };
+          sendOrderEmail(orderDetails, customer_email);
+        } catch (mailErr) {
+          console.error("Email send error:", mailErr);
+        }
+      }
+
+      return res.redirect(`https://zelanstore.com/orders?payment=success&orderId=${effectiveOrderId}`);
+    } else {
+      if (pendingRecord) {
+        await pendingPaymentModel.updateOne(
+          { orderId: effectiveOrderId },
+          { $set: { status: "failed" } }
+        );
+      }
+      return res.redirect(`https://zelanstore.com/orders?payment=failed&orderId=${effectiveOrderId}&status=${encodeURIComponent(statusResult.status || "FAILED")}`);
     }
   } catch (error) {
-    console.error("Internal Server Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("Smile check status error:", error);
+    return res.redirect("https://zelanstore.com/orders?payment=error");
   }
 });
 

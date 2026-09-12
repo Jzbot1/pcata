@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import { message } from "antd";
 import DashboardLayout from "./components/DashboardLayout";
 import Layout from "../components/Layout/Layout";
@@ -12,6 +13,7 @@ import "./Wallet.css";
 import { setUser } from "../redux/features/userSlice.js";
 
 const Wallet = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useSelector((state) => state.user);
   const [tab, setTab] = useState(1);
   const dispatch = useDispatch();
@@ -26,7 +28,21 @@ const Wallet = () => {
 
   useEffect(() => {
     getUserData(dispatch, setUser, setBalance);
-  }, []);
+
+    const paymentStatus = searchParams.get("payment");
+    const txnOrderId = searchParams.get("orderId");
+    if (paymentStatus === "success") {
+      message.success(
+        `Payment successful! ${txnOrderId ? `Order ID: ${txnOrderId}` : ""} Wallet balance updated.`
+      );
+    } else if (paymentStatus === "failed") {
+      message.error(
+        `Payment was not completed or failed. ${txnOrderId ? `(Order: ${txnOrderId})` : ""}`
+      );
+    } else if (paymentStatus === "error") {
+      message.error("An error occurred while verifying the payment.");
+    }
+  }, [searchParams]);
 
   async function getUserWalletHistory() {
     try {

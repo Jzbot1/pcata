@@ -83,6 +83,34 @@ router.post("/create-order", authMiddleware, async (req, res) => {
       }
     }
 
+const pendingPaymentModel = require("../models/pendingPaymentModel");
+
+    // Save pending payment record
+    await pendingPaymentModel.findOneAndUpdate(
+      { orderId: order_id.toString() },
+      {
+        $set: {
+          orderId: order_id.toString(),
+          type: "order",
+          apiName: "manual",
+          amount: amount.toString(),
+          finalPrice: finalPrice,
+          customerName: finalCustomerName,
+          customerEmail: customer_email,
+          customerMobile: customer_mobile || "",
+          productName: product_name,
+          userId: userid,
+          zoneId: zoneid,
+          rawNote: txn_note,
+          couponId: couponId || "",
+          couponName: couponName || "",
+          discountApplied: discountApplied || 0,
+          status: "pending",
+        },
+      },
+      { upsert: true, new: true }
+    );
+
     const redirectUrl = `https://zelanstore.com/api/manual/check-status`;
 
     const result = await paymentGatewayService.createOrder({
@@ -115,19 +143,38 @@ router.post("/create-order", authMiddleware, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-router.post("/check-status", async (req, res) => {
+
+router.all("/check-status", async (req, res) => {
   try {
-    const { client_txn_id, order_id, orderId, txn_id } = req.query;
-    const effectiveOrderId = (client_txn_id || order_id || orderId || "").toString();
+    const query = req.query || {};
+    const body = req.body || {};
 
-    if(!effectiveOrderId){
-      return res.status(400).json({ message: "transaction id not found" });
+    const effectiveOrderId = (
+      query.client_txn_id ||
+      query.order_id ||
+      query.orderId ||
+      query.txn_id ||
+      query.idtrx ||
+      body.client_txn_id ||
+      body.order_id ||
+      body.orderId ||
+      body.txn_id ||
+      body.idtrx ||
+      ""
+    ).toString();
+
+    if (!effectiveOrderId) {
+      return res.redirect("https://zelanstore.com/orders?payment=failed&msg=MissingOrderId");
     }
 
-    // Check if order exists
+    // Check if order already fulfilled
     if (await orderModel.findOne({ orderId: effectiveOrderId })) {
-      return res.redirect("https://zelanstore.com/user-dashboard");
+      return res.redirect(`https://zelanstore.com/orders?payment=success&orderId=${effectiveOrderId}`);
     }
+
+    const pendingRecord = await pendingPaymentModel.findOne({
+      orderId: effectiveOrderId,
+    });
 
     const statusResult = await paymentGatewayService.checkOrderStatus({
       orderId: effectiveOrderId,
@@ -138,150 +185,145 @@ router.post("/check-status", async (req, res) => {
 
     if (statusResult.isSuccess) {
       const data = statusResult.data || {};
-      const txn_amount = parseFloat(statusResult.amount || data.amount || 0);
-      const order_id = statusResult.orderId || data.order_id || effectiveOrderId;
-      const utr_number = statusResult.utr || data.upi_txn_id || data.utr || "none";
-      const customer_name = data.customer_name || "Customer";
-      const customer_email = data.customer_email || data.remark2 || "";
-      const customer_mobile = data.customer_mobile || "";
-      const pname = data.p_info || data.remark1 || "";
-      const customer_vpa = data.customer_vpa || "none";
-      const udf1 = data.udf1 || data.remark1 || "";
-      const udf2 = data.udf2 || data.remark2 || "";
+      const txn_amount =
+        parseFloat(statusResult.amount) ||
+        parseFloat(data.amount) ||
+        parseFloat(pendingRecord?.finalPrice) ||
+        0;
 
-      let userid = "";
-      let zoneid = "";
-      let amount = "";
+      const utr_number =
+        statusResult.utr ||
+        data.upi_txn_id ||
+        data.utr ||
+        data.bank_ref_num ||
+        "none";
 
-      if (udf1 && udf1.includes("@")) {
-        const parts = udf1.split("@");
-        userid = parts[0];
-        zoneid = parts[1];
-        amount = parts[2];
-      }
+      const customer_name =
+        pendingRecord?.customerName ||
+        data.customer_name ||
+        "Customer";
 
-      if (statusResult.isSuccess) {
+      const customer_email =
+        pendingRecord?.customerEmail ||
+        data.customer_email ||
+        data.remark2 ||
+        "";
 
-        await new paymentModel({
-          name: customer_name,
-          email: customer_email,
-          mobile: customer_mobile,
-          amount: txn_amount,
-          orderId: order_id,
-          status: "success",
-          type: "order",
-          pname: pname,
-          upi_txn_id: utr_number || "none",
-          payerUpi: customer_vpa || "none",
-        }).save();
+      const customer_mobile =
+        pendingRecord?.customerMobile ||
+        data.customer_mobile ||
+        "";
 
-        // Validate Product
-        const pp = await productModel.findOne({ name: pname });
-        if (!pp) {
-          return res.status(201).json({ message: "Product not found" });
-        }
+      const pname =
+        pendingRecord?.productName ||
+        data.p_info ||
+        data.remark1 ||
+        "";
 
-        //CROSS CHECK PACKAGE PRICE AND GAME ID
-        const priceExists = pp.cost.some(
-          (item) =>
-            item.amount === amount &&
-            (Number(item.price) === Number(txn_amount) || (Number(item.resPrice) === Number(txn_amount)))
+      const userid = pendingRecord?.userId || "";
+      const zoneid = pendingRecord?.zoneId || "";
+      const amount = pendingRecord?.amount || "";
+      const discount = pendingRecord?.discountApplied > 0 ? `${pendingRecord.couponName} - ${pendingRecord.discountApplied}Rs` : "";
+
+      await new paymentModel({
+        name: customer_name,
+        email: customer_email,
+        mobile: customer_mobile,
+        amount: txn_amount,
+        orderId: effectiveOrderId,
+        status: "success",
+        type: "order",
+        pname: pname,
+        upi_txn_id: utr_number,
+        payerUpi: data.customer_vpa || "none",
+      }).save();
+
+      // placing manual order
+      const orderData = {
+        api: "no",
+        amount,
+        orderId: effectiveOrderId,
+        p_info: pname,
+        price: txn_amount,
+        customer_email,
+        customer_mobile,
+        playerId: userid,
+        userId: userid,
+        zoneId: zoneid,
+        status: "pending",
+        paymentMode: "UPI",
+        ...(discount && { discount }),
+      };
+
+      await new orderModel(orderData).save();
+
+      if (pendingRecord) {
+        await pendingPaymentModel.updateOne(
+          { orderId: effectiveOrderId },
+          { $set: { status: "success" } }
         );
-
-        if (!priceExists) {
-          return res.status(201).json({ message: "Amount does not match." });
-        }
-        
-        // placing order
-        const orderData = {
-          api: "no",
-          amount,
-          orderId: order_id,
-          p_info: pname,
-          price: txn_amount,
-          customer_email,
-          customer_mobile,
-          playerId: userid,
-          userId: userid,
-          zoneId: zoneid,
-          status: "pending",
-          paymentMode: "UPI",
-          ...(udf2 && { discount: udf2 }), // Add Discount Key Only If Discount Applied
-        };
-
-        // Save Order
-        await new orderModel(orderData).save();
-
-        //! SEND MAIL TO USER
-        try {
-          const dynamicData = {
-            orderId: `${order_id}`,
-            amount: `${amount}`,
-            price: `${txn_amount}`,
-            p_info: `${pname}`,
-            userId: `${userid}`,
-            zoneId: `${zoneid}`,
-          };
-          let htmlContent = fs.readFileSync("order.html", "utf8");
-          Object.keys(dynamicData).forEach((key) => {
-            const placeholder = new RegExp(`{${key}}`, "g");
-            htmlContent = htmlContent.replace(placeholder, dynamicData[key]);
-          });
-          // Send mail
-          let mailTransporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-              user: process.env.MAIL,
-              pass: process.env.APP_PASSWORD,
-            },
-          });
-          let mailDetails = {
-            from: process.env.MAIL,
-            to: `${customer_email}`,
-            subject: "Order Successful!",
-            html: htmlContent,
-          };
-          mailTransporter.sendMail(mailDetails, function (err, data) {
-            if (err) {
-              console.log(err);
-            }
-          });
-        } catch (error) {
-          console.error("Error sending email:", error);
-        }
-
-        //! SENDING MAIL TO ADMIN
-        const sub = "New Order Recieved";
-        const msgg =
-          `Hello Admin! You have received a new ${pname} order. Kindly login to see your order.`;
-        await sendMail(process.env.CLIENT_EMAIL, sub, "", msgg);
-
-        return res.redirect(`https://zelanstore.com/user-dashboard/`);
-      } else {
-        const orderData = {
-          api: "no",
-          amount,
-          orderId: order_id,
-          p_info: pname,
-          price: txn_amount,
-          customer_email,
-          customer_mobile,
-          playerId: userid,
-          userId: userid,
-          zoneId: zoneid,
-          status: "failed",
-          paymentMode: "UPI",
-          ...(udf2 && { discount: udf2 }), // Add Discount Key Only If Discount Applied
-        };
-
-        // Save Order
-        await new orderModel(orderData).save();
-        return res.redirect("https://zelanstore.com/");
       }
+
+      //! SEND MAIL TO USER
+      try {
+        const dynamicData = {
+          orderId: `${effectiveOrderId}`,
+          amount: `${amount}`,
+          price: `${txn_amount}`,
+          p_info: `${pname}`,
+          userId: `${userid}`,
+          zoneId: `${zoneid}`,
+        };
+        let htmlContent = fs.readFileSync("order.html", "utf8");
+        Object.keys(dynamicData).forEach((key) => {
+          const placeholder = new RegExp(`{${key}}`, "g");
+          htmlContent = htmlContent.replace(placeholder, dynamicData[key]);
+        });
+        // Send mail
+        let mailTransporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: process.env.MAIL,
+            pass: process.env.APP_PASSWORD,
+          },
+        });
+        let mailDetails = {
+          from: process.env.MAIL,
+          to: `${customer_email}`,
+          subject: "Order Successful!",
+          html: htmlContent,
+        };
+        mailTransporter.sendMail(mailDetails, function (err, data) {
+          if (err) {
+            console.log(err);
+          }
+        });
+      } catch (error) {
+        console.error("Error sending email:", error);
+      }
+
+      //! SENDING MAIL TO ADMIN
+      try {
+        const sub = "New Order Recieved";
+        const msgg = `Hello Admin! You have received a new ${pname} order. Kindly login to see your order.`;
+        await sendMail(process.env.CLIENT_EMAIL, sub, "", msgg);
+      } catch (err) {
+        console.error("Admin mail error:", err);
+      }
+
+      return res.redirect(`https://zelanstore.com/orders?payment=success&orderId=${effectiveOrderId}`);
+    } else {
+      if (pendingRecord) {
+        await pendingPaymentModel.updateOne(
+          { orderId: effectiveOrderId },
+          { $set: { status: "failed" } }
+        );
+      }
+      return res.redirect(`https://zelanstore.com/orders?payment=failed&orderId=${effectiveOrderId}&status=${encodeURIComponent(statusResult.status || "FAILED")}`);
     }
   } catch (error) {
-    console.error("Internal Server Error:", error.message);
-    res.status(500).json({ error: error.message });
+    console.error("Manual check status error:", error.message);
+    res.redirect("https://zelanstore.com/orders?payment=error");
   }
 });
 

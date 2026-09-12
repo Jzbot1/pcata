@@ -158,7 +158,19 @@ class PaymentGatewayService {
    */
   static async checkOrderStatus({ orderId, client_txn_id, txnDate }) {
     const config = await this.getConfig();
-    const effectiveOrderId = (orderId || client_txn_id).toString();
+    const effectiveOrderId = (orderId || client_txn_id || "").toString();
+
+    if (!effectiveOrderId) {
+      return {
+        isSuccess: false,
+        status: "NO_ORDER_ID",
+        orderId: "",
+        amount: 0,
+        utr: "",
+        data: {},
+        raw: {},
+      };
+    }
 
     if (config.gatewayType === "JZSTORE") {
       // JZSTORE / ALL-IN-ONE GATEWAY
@@ -170,43 +182,103 @@ class PaymentGatewayService {
 
       console.log("[JZSTORE] Checking order status:", endpoint, postData);
 
-      const response = await axios.post(endpoint, qs.stringify(postData), {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        timeout: 15000,
-      });
+      try {
+        const response = await axios.post(endpoint, qs.stringify(postData), {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          timeout: 15000,
+        });
 
-      console.log("[JZSTORE] Status check response:", response.data);
+        console.log("[JZSTORE] Status check response:", response.data);
 
-      const resData = response.data;
-      const resultObj = resData.result || resData.data || resData;
+        const resData = response.data || {};
+        const resultObj = resData.result || resData.data || resData || {};
 
-      const rawStatus = (
-        resultObj.status ||
-        resData.status ||
-        resultObj.txnStatus ||
-        ""
-      ).toString().toUpperCase();
+        const rawStatus = (
+          resultObj.txnStatus ||
+          resultObj.status ||
+          resData.status ||
+          ""
+        )
+          .toString()
+          .toUpperCase()
+          .trim();
 
-      const isSuccess = ["SUCCESS", "COMPLETED", "PAID", "TRUE"].includes(rawStatus);
+        const rawMsg = (
+          resultObj.resultInfo ||
+          resultObj.message ||
+          resData.message ||
+          resData.msg ||
+          ""
+        )
+          .toString()
+          .toUpperCase();
 
-      return {
-        isSuccess,
-        status: rawStatus,
-        orderId: resultObj.order_id || resultObj.orderId || effectiveOrderId,
-        amount: parseFloat(resultObj.amount || resultObj.txn_amount || 0),
-        utr: resultObj.utr || resultObj.upi_txn_id || resultObj.utr_number || "",
-        data: resultObj,
-        raw: resData,
-      };
+        const isSuccess =
+          [
+            "SUCCESS",
+            "TXN_SUCCESS",
+            "COMPLETED",
+            "PAID",
+            "TRUE",
+            "OK",
+            "200",
+            "SUCCESSFUL",
+          ].includes(rawStatus) ||
+          rawStatus.includes("SUCCESS") ||
+          rawStatus.includes("COMPLET") ||
+          rawStatus.includes("PAID") ||
+          (resData.status === true &&
+            !["PENDING", "FAILED", "FAILURE", "TXN_FAILURE"].includes(rawStatus));
+
+        const amount = parseFloat(
+          resultObj.amount || resultObj.txn_amount || resData.amount || 0
+        );
+        const utr = (
+          resultObj.utr ||
+          resultObj.upi_txn_id ||
+          resultObj.utr_number ||
+          resultObj.bank_ref_num ||
+          resultObj.rrn ||
+          ""
+        ).toString();
+
+        return {
+          isSuccess,
+          status: rawStatus || (isSuccess ? "SUCCESS" : "PENDING"),
+          orderId:
+            resultObj.orderId ||
+            resultObj.order_id ||
+            resData.order_id ||
+            effectiveOrderId,
+          amount,
+          utr,
+          data: resultObj,
+          raw: resData,
+        };
+      } catch (err) {
+        console.error("[JZSTORE] Status check request error:", err.response ? err.response.data : err.message);
+        return {
+          isSuccess: false,
+          status: "ERROR",
+          orderId: effectiveOrderId,
+          amount: 0,
+          utr: "",
+          data: {},
+          raw: err.response?.data || {},
+        };
+      }
     } else {
       // EKQR / UPIGATEWAY
       const endpoint = `${config.apiUrl}/api/check_order_status`;
       const date = new Date();
       const formattedDate =
         txnDate ||
-        date.toLocaleDateString("en-GB", { timeZone: "Asia/Kolkata" }).split("/").join("-");
+        date
+          .toLocaleDateString("en-GB", { timeZone: "Asia/Kolkata" })
+          .split("/")
+          .join("-");
 
       const postData = {
         key: config.apiKey,
@@ -216,29 +288,56 @@ class PaymentGatewayService {
 
       console.log("[UPIGATEWAY] Checking order status:", endpoint, postData);
 
-      const response = await axios.post(endpoint, postData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        timeout: 15000,
-      });
+      try {
+        const response = await axios.post(endpoint, postData, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          timeout: 15000,
+        });
 
-      console.log("[UPIGATEWAY] Status check response:", response.data);
+        console.log("[UPIGATEWAY] Status check response:", response.data);
 
-      const resData = response.data;
-      const dataObj = resData.data || {};
-      const rawStatus = (dataObj.status || dataObj.txnStatus || "").toString().toUpperCase();
-      const isSuccess = resData.status === true && (rawStatus === "SUCCESS" || rawStatus === "COMPLETED");
+        const resData = response.data || {};
+        const dataObj = resData.data || {};
+        const rawStatus = (
+          dataObj.status ||
+          dataObj.txnStatus ||
+          resData.status ||
+          ""
+        )
+          .toString()
+          .toUpperCase()
+          .trim();
 
-      return {
-        isSuccess,
-        status: rawStatus,
-        orderId: dataObj.client_txn_id || effectiveOrderId,
-        amount: parseFloat(dataObj.amount || 0),
-        utr: dataObj.upi_txn_id || dataObj.utr || "",
-        data: dataObj,
-        raw: resData,
-      };
+        const isSuccess =
+          (resData.status === true ||
+            ["SUCCESS", "TXN_SUCCESS", "COMPLETED", "PAID", "TRUE"].includes(
+              rawStatus
+            )) &&
+          !["PENDING", "FAILED", "FAILURE", "TXN_FAILURE"].includes(rawStatus);
+
+        return {
+          isSuccess,
+          status: rawStatus || (isSuccess ? "SUCCESS" : "PENDING"),
+          orderId: dataObj.client_txn_id || effectiveOrderId,
+          amount: parseFloat(dataObj.amount || 0),
+          utr: (dataObj.upi_txn_id || dataObj.utr || "").toString(),
+          data: dataObj,
+          raw: resData,
+        };
+      } catch (err) {
+        console.error("[UPIGATEWAY] Status check request error:", err.response ? err.response.data : err.message);
+        return {
+          isSuccess: false,
+          status: "ERROR",
+          orderId: effectiveOrderId,
+          amount: 0,
+          utr: "",
+          data: {},
+          raw: err.response?.data || {},
+        };
+      }
     }
   }
 }

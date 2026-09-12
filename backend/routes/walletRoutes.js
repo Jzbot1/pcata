@@ -155,6 +155,8 @@ router.get("/status", async (req, res) => {
   }
 });
 
+const pendingPaymentModel = require("../models/pendingPaymentModel");
+
 // add money to wallet, Dynamic Gateway (JZStore / UPIGateway)
 router.post("/create-payment", authMiddleware, async (req, res) => {
   try {
@@ -167,12 +169,41 @@ router.post("/create-payment", authMiddleware, async (req, res) => {
       customerNumber,
     } = req.body;
 
+    const finalAmount = parseFloat(amount);
+    if (!finalAmount || finalAmount < 1) {
+      return res.status(400).send({
+        success: false,
+        message: "Invalid amount. Minimum amount is ₹1.",
+      });
+    }
+
     const redirectUrl = `https://zelanstore.com/api/wallet/check-payment-status`;
+
+    // Save pending payment record to maintain context
+    await pendingPaymentModel.findOneAndUpdate(
+      { orderId: orderId.toString() },
+      {
+        $set: {
+          orderId: orderId.toString(),
+          type: "wallet",
+          apiName: "wallet",
+          amount: finalAmount.toString(),
+          finalPrice: finalAmount,
+          customerName: customerName || "Customer",
+          customerEmail: customerEmail || "",
+          customerMobile: customerNumber || "",
+          productName: "Wallet Topup",
+          rawNote: paymentNote || "Wallet Topup",
+          status: "pending",
+        },
+      },
+      { upsert: true, new: true }
+    );
 
     const result = await paymentGatewayService.createOrder({
       orderId,
-      amount,
-      customerName,
+      amount: finalAmount,
+      customerName: customerName || "Customer",
       customerEmail,
       customerMobile: customerNumber,
       redirectUrl,
@@ -200,22 +231,43 @@ router.post("/create-payment", authMiddleware, async (req, res) => {
   }
 });
 
-router.get("/check-payment-status", async (req, res) => {
+router.all("/check-payment-status", async (req, res) => {
   try {
-    const { client_txn_id, order_id, orderId, txn_id } = req.query;
-    const effectiveOrderId = (client_txn_id || order_id || orderId || "").toString();
+    const query = req.query || {};
+    const body = req.body || {};
+
+    const effectiveOrderId = (
+      query.client_txn_id ||
+      query.order_id ||
+      query.orderId ||
+      query.txn_id ||
+      query.idtrx ||
+      body.client_txn_id ||
+      body.order_id ||
+      body.orderId ||
+      body.txn_id ||
+      body.idtrx ||
+      ""
+    ).toString();
+
+    console.log("[WALLET_CHECK_PAYMENT_STATUS] Received orderId:", effectiveOrderId, "Query:", query, "Body:", body);
 
     if (!effectiveOrderId) {
-      return res.redirect(`${process.env.BASE_URL || "https://zelanstore.com"}/failure`);
+      return res.redirect(`https://zelanstore.com/wallet?payment=failed&msg=MissingOrderId`);
     }
 
+    // Check if already credited
     const existingPayment = await paymentModel.findOne({
       orderId: effectiveOrderId,
     });
 
     if (existingPayment) {
-      return res.redirect(`https://zelanstore.com/wallet`);
+      return res.redirect(`https://zelanstore.com/wallet?payment=success&orderId=${effectiveOrderId}`);
     }
+
+    const pendingRecord = await pendingPaymentModel.findOne({
+      orderId: effectiveOrderId,
+    });
 
     const statusResult = await paymentGatewayService.checkOrderStatus({
       orderId: effectiveOrderId,
@@ -226,15 +278,42 @@ router.get("/check-payment-status", async (req, res) => {
 
     if (statusResult.isSuccess) {
       const data = statusResult.data || {};
-      const txnAmount = parseFloat(statusResult.amount || data.amount || 0);
-      const utr = statusResult.utr || data.upi_txn_id || data.utr || "none";
-      const customerEmail = data.customer_email || data.remark2 || (req.query.email || "");
+      const txnAmount =
+        parseFloat(statusResult.amount) ||
+        parseFloat(data.amount) ||
+        parseFloat(pendingRecord?.finalPrice) ||
+        0;
+
+      const utr =
+        statusResult.utr ||
+        data.upi_txn_id ||
+        data.utr ||
+        data.bank_ref_num ||
+        "none";
+
+      const customerEmail =
+        pendingRecord?.customerEmail ||
+        data.customer_email ||
+        data.remark2 ||
+        query.email ||
+        body.email ||
+        "";
+
+      const customerName =
+        pendingRecord?.customerName ||
+        data.customer_name ||
+        "Customer";
+
+      const customerMobile =
+        pendingRecord?.customerMobile ||
+        data.customer_mobile ||
+        "";
 
       const paymentObject = {
         orderId: effectiveOrderId,
-        name: data.customer_name || "Customer",
+        name: customerName,
         email: customerEmail,
-        mobile: data.customer_mobile || "",
+        mobile: customerMobile,
         amount: txnAmount,
         status: "success",
         type: "wallet",
@@ -251,7 +330,7 @@ router.get("/check-payment-status", async (req, res) => {
         user = await userModel.findOne({ email: customerEmail });
       }
 
-      if (user) {
+      if (user && txnAmount > 0) {
         const currentBalance = parseFloat(user?.balance) || 0;
         const newBalance = currentBalance + txnAmount;
 
@@ -267,19 +346,32 @@ router.get("/check-payment-status", async (req, res) => {
           balanceBefore: currentBalance,
           balanceAfter: newBalance,
           price: `+${txnAmount}`,
-          p_info: "Wallet",
+          p_info: "Wallet Topup",
           type: "addmoney",
         });
         await newHistory.save();
       }
 
-      return res.redirect(`https://zelanstore.com/wallet`);
+      if (pendingRecord) {
+        await pendingPaymentModel.updateOne(
+          { orderId: effectiveOrderId },
+          { $set: { status: "success" } }
+        );
+      }
+
+      return res.redirect(`https://zelanstore.com/wallet?payment=success&orderId=${effectiveOrderId}`);
     } else {
-      return res.redirect(`${process.env.BASE_URL || "https://zelanstore.com"}/failure`);
+      if (pendingRecord) {
+        await pendingPaymentModel.updateOne(
+          { orderId: effectiveOrderId },
+          { $set: { status: "failed" } }
+        );
+      }
+      return res.redirect(`https://zelanstore.com/wallet?payment=failed&orderId=${effectiveOrderId}&status=${encodeURIComponent(statusResult.status || "FAILED")}`);
     }
   } catch (error) {
     console.error("Wallet check status error:", error);
-    res.redirect(`${process.env.BASE_URL || "https://zelanstore.com"}/failure`);
+    res.redirect(`https://zelanstore.com/wallet?payment=error`);
   }
 });
 
@@ -290,22 +382,78 @@ router.post("/webhook", async (req, res) => {
     console.log("[GATEWAY_WEBHOOK] Received:", JSON.stringify(rawPayload));
 
     const resultObj = rawPayload.result || rawPayload.data || rawPayload;
-    const rawStatus = (resultObj.status || "").toString().toUpperCase();
-    const orderId = (resultObj.orderId || resultObj.order_id || resultObj.client_txn_id || "").toString();
-    const amount = parseFloat(resultObj.amount || 0);
-    const utr = (resultObj.utr || resultObj.upi_txn_id || "").toString();
+    const rawStatus = (
+      resultObj.txnStatus ||
+      resultObj.status ||
+      rawPayload.status ||
+      ""
+    )
+      .toString()
+      .toUpperCase();
 
-    if (["SUCCESS", "COMPLETED"].includes(rawStatus) && orderId) {
+    const orderId = (
+      resultObj.orderId ||
+      resultObj.order_id ||
+      resultObj.client_txn_id ||
+      rawPayload.order_id ||
+      rawPayload.orderId ||
+      ""
+    ).toString();
+
+    const isSuccess =
+      [
+        "SUCCESS",
+        "TXN_SUCCESS",
+        "COMPLETED",
+        "PAID",
+        "TRUE",
+        "OK",
+        "200",
+      ].includes(rawStatus) ||
+      rawStatus.includes("SUCCESS") ||
+      rawStatus.includes("COMPLET");
+
+    if (isSuccess && orderId) {
       const existingPayment = await paymentModel.findOne({ orderId });
       if (!existingPayment) {
-        const customerEmail = resultObj.remark2 || resultObj.customer_email || "";
-        let user = customerEmail ? await userModel.findOne({ email: customerEmail }) : null;
+        const pendingRecord = await pendingPaymentModel.findOne({ orderId });
+
+        const amount =
+          parseFloat(resultObj.amount) ||
+          parseFloat(resultObj.txn_amount) ||
+          parseFloat(pendingRecord?.finalPrice) ||
+          0;
+
+        const utr = (
+          resultObj.utr ||
+          resultObj.upi_txn_id ||
+          resultObj.utr_number ||
+          "none"
+        ).toString();
+
+        const customerEmail =
+          pendingRecord?.customerEmail ||
+          resultObj.remark2 ||
+          resultObj.customer_email ||
+          "";
+
+        let user = customerEmail
+          ? await userModel.findOne({ email: customerEmail })
+          : null;
 
         await new paymentModel({
           orderId,
-          name: resultObj.customer_name || user?.name || "Customer",
+          name:
+            pendingRecord?.customerName ||
+            resultObj.customer_name ||
+            user?.name ||
+            "Customer",
           email: customerEmail || user?.email || "",
-          mobile: resultObj.customer_mobile || user?.mobile || "",
+          mobile:
+            pendingRecord?.customerMobile ||
+            resultObj.customer_mobile ||
+            user?.mobile ||
+            "",
           amount,
           status: "success",
           type: "wallet",
@@ -313,7 +461,7 @@ router.post("/webhook", async (req, res) => {
           upi_txn_id: utr || "none",
         }).save();
 
-        if (user) {
+        if (user && amount > 0) {
           const currentBalance = parseFloat(user.balance) || 0;
           const newBalance = currentBalance + amount;
 
@@ -332,6 +480,13 @@ router.post("/webhook", async (req, res) => {
             p_info: "Wallet Topup",
             type: "addmoney",
           }).save();
+        }
+
+        if (pendingRecord) {
+          await pendingPaymentModel.updateOne(
+            { orderId },
+            { $set: { status: "success" } }
+          );
         }
       }
 
