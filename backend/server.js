@@ -21,7 +21,7 @@ const session = require("express-session");
 require("./cron/yokcashStatusChecker.js");
 
 // dotenv
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, ".env") });
 //mongodb connection
 connectDB();
 // rest object

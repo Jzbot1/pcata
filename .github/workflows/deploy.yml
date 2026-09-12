@@ -1,0 +1,38 @@
+name: Deploy Zelan Store to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            echo "🚀 Starting deployment on AWS EC2..."
+            cd /var/www/pcata || cd /var/www/zelan-store
+            git pull origin main
+            
+            echo "📦 Installing backend dependencies..."
+            npm install --prefix backend --omit=dev
+            
+            echo "📦 Installing client dependencies & building frontend..."
+            npm install --prefix client --legacy-peer-deps
+            npm run build --prefix client
+            
+            echo "🔄 Restarting application with PM2..."
+            pm2 restart zelan-backend || pm2 start backend/server.js --name "zelan-backend"
+            
+            echo "✅ Deployment completed successfully!"
