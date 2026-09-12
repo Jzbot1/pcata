@@ -65,6 +65,23 @@ class PaymentGatewayService {
     const config = await this.getConfig();
     const cleanMobile = (customerMobile || "9999999999").toString().replace(/\D/g, "").slice(-10);
 
+    // Ensure redirectUrl contains order_id parameters so callbacks from gateways that don't append query params preserve the orderId
+    let finalRedirectUrl = (redirectUrl || "").trim();
+    if (finalRedirectUrl && orderId) {
+      const sep = finalRedirectUrl.includes("?") ? "&" : "?";
+      if (
+        !finalRedirectUrl.includes("order_id=") &&
+        !finalRedirectUrl.includes("orderId=") &&
+        !finalRedirectUrl.includes("client_txn_id=")
+      ) {
+        finalRedirectUrl = `${finalRedirectUrl}${sep}order_id=${encodeURIComponent(
+          orderId
+        )}&client_txn_id=${encodeURIComponent(
+          orderId
+        )}&orderId=${encodeURIComponent(orderId)}`;
+      }
+    }
+
     if (config.gatewayType === "JZSTORE") {
       // JZSTORE / ALL-IN-ONE GATEWAY
       const endpoint = `${config.apiUrl}/api/create-order`;
@@ -73,7 +90,7 @@ class PaymentGatewayService {
         amount: parseFloat(amount),
         order_id: orderId.toString(),
         customer_mobile: cleanMobile,
-        redirect_url: redirectUrl || "",
+        redirect_url: finalRedirectUrl,
         remark1: (remark1 || note || "Order Payment").toString(),
         remark2: (remark2 || customerEmail || "").toString(),
       };
@@ -123,7 +140,7 @@ class PaymentGatewayService {
         customer_name: customerName || "Customer",
         customer_email: customerEmail || "customer@zelanstore.com",
         customer_mobile: cleanMobile,
-        redirect_url: redirectUrl,
+        redirect_url: finalRedirectUrl,
         udf1: (remark1 || note || "").toString(),
         udf2: (remark2 || "").toString(),
         udf3: "",

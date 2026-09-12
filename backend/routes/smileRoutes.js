@@ -117,7 +117,7 @@ router.post("/create-order", generalRateLimiter, authMiddleware, async (req, res
       { upsert: true, new: true }
     );
 
-    const redirectUrl = `https://zelanstore.com/api/smile/check-status`;
+    const redirectUrl = `https://zelanstore.com/api/smile/check-status?order_id=${encodeURIComponent(order_id)}&client_txn_id=${encodeURIComponent(order_id)}&orderId=${encodeURIComponent(order_id)}`;
 
     const result = await paymentGatewayService.createOrder({
       orderId: order_id,
@@ -155,19 +155,28 @@ router.all("/check-status", generalRateLimiter, async (req, res) => {
     const query = req.query || {};
     const body = req.body || {};
 
-    const effectiveOrderId = (
+    let effectiveOrderId = (
       query.client_txn_id ||
       query.order_id ||
       query.orderId ||
       query.txn_id ||
       query.idtrx ||
+      query.id ||
       body.client_txn_id ||
       body.order_id ||
       body.orderId ||
       body.txn_id ||
       body.idtrx ||
+      body.id ||
       ""
-    ).toString();
+    ).toString().trim();
+
+    if (!effectiveOrderId && req.originalUrl) {
+      const match = req.originalUrl.match(/[?&](?:order_id|orderId|client_txn_id|txn_id)=([^&#]+)/i);
+      if (match && match[1]) {
+        effectiveOrderId = decodeURIComponent(match[1]).trim();
+      }
+    }
 
     if (!effectiveOrderId) {
       return res.redirect("https://zelanstore.com/orders?payment=failed&msg=MissingOrderId");

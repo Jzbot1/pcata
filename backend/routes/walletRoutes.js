@@ -177,7 +177,7 @@ router.post("/create-payment", authMiddleware, async (req, res) => {
       });
     }
 
-    const redirectUrl = `https://zelanstore.com/api/wallet/check-payment-status`;
+    const redirectUrl = `https://zelanstore.com/api/wallet/check-payment-status?order_id=${encodeURIComponent(orderId)}&client_txn_id=${encodeURIComponent(orderId)}&orderId=${encodeURIComponent(orderId)}`;
 
     // Save pending payment record to maintain context
     await pendingPaymentModel.findOneAndUpdate(
@@ -236,19 +236,28 @@ router.all("/check-payment-status", async (req, res) => {
     const query = req.query || {};
     const body = req.body || {};
 
-    const effectiveOrderId = (
+    let effectiveOrderId = (
       query.client_txn_id ||
       query.order_id ||
       query.orderId ||
       query.txn_id ||
       query.idtrx ||
+      query.id ||
       body.client_txn_id ||
       body.order_id ||
       body.orderId ||
       body.txn_id ||
       body.idtrx ||
+      body.id ||
       ""
-    ).toString();
+    ).toString().trim();
+
+    if (!effectiveOrderId && req.originalUrl) {
+      const match = req.originalUrl.match(/[?&](?:order_id|orderId|client_txn_id|txn_id)=([^&#]+)/i);
+      if (match && match[1]) {
+        effectiveOrderId = decodeURIComponent(match[1]).trim();
+      }
+    }
 
     console.log("[WALLET_CHECK_PAYMENT_STATUS] Received orderId:", effectiveOrderId, "Query:", query, "Body:", body);
 
