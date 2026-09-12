@@ -101,33 +101,49 @@ function checkReferer(req, res, next) {
 }
 // app.use("/api", checkReferer);
 
+// Ensure upload directories exist
+const uploadDirs = [
+  "banners",
+  "productImages",
+  "gallery",
+  "notificationImages",
+  "promoImg",
+];
+uploadDirs.forEach((dir) => {
+  const fullPath = path.join(__dirname, dir);
+  if (!fs.existsSync(fullPath)) fs.mkdirSync(fullPath, { recursive: true });
+  const rootPath = path.join(process.cwd(), dir);
+  if (!fs.existsSync(rootPath)) fs.mkdirSync(rootPath, { recursive: true });
+});
+
 // Static file for images
 app.use(
   "/productImages",
-  express.static(path.join(__dirname, "productImages"))
+  express.static(path.join(__dirname, "productImages")),
+  express.static("productImages")
 );
 app.set('trust proxy', 1);
-app.use("/admin-products", express.static("productImages"));
-app.use("/admin-edit-product/:id", express.static("productImages"));
-app.use("/admin-view-order/:id", express.static("productImages"));
-app.use("/product/", express.static("productImages"));
-app.use("/product/:name", express.static("productImages"));
+app.use("/admin-products", express.static("productImages"), express.static(path.join(__dirname, "productImages")));
+app.use("/admin-edit-product/:id", express.static("productImages"), express.static(path.join(__dirname, "productImages")));
+app.use("/admin-view-order/:id", express.static("productImages"), express.static(path.join(__dirname, "productImages")));
+app.use("/product/", express.static("productImages"), express.static(path.join(__dirname, "productImages")));
+app.use("/product/:name", express.static("productImages"), express.static(path.join(__dirname, "productImages")));
 //! GALLERY
-app.use("/gallery", express.static(path.join(__dirname, "gallery")));
-app.use("/gallery", express.static("gallery"));
-app.use("/product/:name", express.static("gallery"));
+app.use("/gallery", express.static(path.join(__dirname, "gallery")), express.static("gallery"));
+app.use("/product/:name", express.static("gallery"), express.static(path.join(__dirname, "gallery")));
 //! NOTIFICATION
 app.use(
   "/notificationImages",
-  express.static(path.join(__dirname, "notificationImages"))
+  express.static(path.join(__dirname, "notificationImages")),
+  express.static("notificationImages")
 );
 //! BANNER
-app.use("/banners", express.static(path.join(__dirname, "banners")));
-app.use("/admin-banners", express.static("banners"));
+app.use("/banners", express.static(path.join(__dirname, "banners")), express.static("banners"));
+app.use("/admin-banners", express.static("banners"), express.static(path.join(__dirname, "banners")));
 //! PROMO
-app.use("/promoImg", express.static(path.join(__dirname, "promoImg")));
-app.use("/admin-promo", express.static("promoImg"));
-app.use("/promo/:id", express.static("promoImg"));
+app.use("/promoImg", express.static(path.join(__dirname, "promoImg")), express.static("promoImg"));
+app.use("/admin-promo", express.static("promoImg"), express.static(path.join(__dirname, "promoImg")));
+app.use("/promo/:id", express.static("promoImg"), express.static(path.join(__dirname, "promoImg")));
 
 // routes
 app.use("/api/user/", require("./routes/userRoutes"));

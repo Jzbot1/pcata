@@ -3,10 +3,21 @@ const multer = require("multer");
 const adminAuthMiddleware = require("../middlewares/adminAuthMiddleware");
 const bannerModel = require("../models/bannerModel");
 
+const fs = require("fs");
+const path = require("path");
+
 const router = express.Router();
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
+    const dir = path.join(__dirname, "../banners");
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    const rootDir = "banners";
+    if (!fs.existsSync(rootDir)) {
+      fs.mkdirSync(rootDir, { recursive: true });
+    }
     cb(null, "banners");
   },
   filename: (req, file, cb) => {

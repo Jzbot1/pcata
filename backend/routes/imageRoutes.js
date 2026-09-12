@@ -8,6 +8,14 @@ const router = express.Router();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
+    const dir = path.join(__dirname, "../gallery");
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    const rootDir = "gallery";
+    if (!fs.existsSync(rootDir)) {
+      fs.mkdirSync(rootDir, { recursive: true });
+    }
     cb(null, "gallery");
   },
   filename: (req, file, cb) => {

@@ -15,8 +15,18 @@ const adminAuthMiddleware = require("../middlewares/adminAuthMiddleware");
 // router object
 const router = express.Router();
 
+const path = require("path");
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
+    const dir = path.join(__dirname, "../productImages");
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    const rootDir = "productImages";
+    if (!fs.existsSync(rootDir)) {
+      fs.mkdirSync(rootDir, { recursive: true });
+    }
     cb(null, "productImages");
   },
   filename: (req, file, cb) => {
