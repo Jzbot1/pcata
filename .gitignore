@@ -27,5 +27,11 @@ client/build/
 .DS_Store
 Thumbs.db
 .vscode/
-.idea/
 .gemini/
+
+# Private deployment documentation & keys
+README_DEPLOY.md
+DEPLOYMENT.md
+DEPLOY.md
+*.pem
+*.key
