@@ -12,6 +12,7 @@ const couponModel = require("../models/couponModel");
 const walletHistoryModel = require("../models/walletHistoryModel");
 const paymentConfigModel = require("../models/paymentConfigModel");
 const paymentGatewayService = require("../services/paymentGatewayService");
+const pendingPaymentModel = require("../models/pendingPaymentModel");
 
 // Create an Express Router
 const router = express.Router();
@@ -82,8 +83,6 @@ router.post("/create-order", authMiddleware, async (req, res) => {
         finalPrice -= discountApplied;
       }
     }
-
-const pendingPaymentModel = require("../models/pendingPaymentModel");
 
     // Save pending payment record
     await pendingPaymentModel.findOneAndUpdate(

@@ -5,6 +5,7 @@ const userModel = require("../models/userModel");
 const walletHistoryModel = require("../models/walletHistoryModel");
 const paymentConfigModel = require("../models/paymentConfigModel");
 const paymentGatewayService = require("../services/paymentGatewayService");
+const pendingPaymentModel = require("../models/pendingPaymentModel");
 const authMiddleware = require("../middlewares/authMiddleware");
 // Create an Express Router
 const router = express.Router();
@@ -154,8 +155,6 @@ router.get("/status", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
-const pendingPaymentModel = require("../models/pendingPaymentModel");
 
 // add money to wallet, Dynamic Gateway (JZStore / UPIGateway)
 router.post("/create-payment", authMiddleware, async (req, res) => {
