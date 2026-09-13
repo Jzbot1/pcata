@@ -1,28 +1,31 @@
-import React, { useState } from "react";
+import React from "react";
 import LogoutIcon from "@mui/icons-material/Logout";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { setUser } from "../../redux/features/userSlice";
 import "./SideMenu.css";
 import { message } from "antd";
-import IMAGES from "../../img/image";
 
 const SideMenu = ({ sideMenu, setSideMenu }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
-  const [submenu, setSubmenu] = useState(false);
 
   const handleLogout = () => {
     localStorage.clear();
+    dispatch(setUser(null));
     message.success("Logout Successful");
+    setSideMenu(false);
     navigate("/login");
   };
 
-  const onSideMenuButtonClick = (link)=>{
-    setSideMenu(!sideMenu);
-    navigate(link)
-  }
+  const onNavClick = (path) => {
+    setSideMenu(false);
+    navigate(path);
+  };
+
   return (
     <div
       className={`sidemenu-container d-block d-md-block d-lg-none ${
@@ -31,92 +34,88 @@ const SideMenu = ({ sideMenu, setSideMenu }) => {
     >
       <div className="sidemenu">
         <HighlightOffIcon
-          onClick={() => setSideMenu(!sideMenu)}
+          onClick={() => setSideMenu(false)}
           className="close-icon"
         />
-        <ul className="p-0">
+        <ul className="p-0 sidemenu-nav-list">
           <li
-            className={`${location.pathname === "/" && "active"}`}
-            onClick={()=>{onSideMenuButtonClick("/")}}
+            className={`${location.pathname === "/" ? "active" : ""}`}
+            onClick={() => onNavClick("/")}
           >
-            <Link to="/">Home</Link>
+            <span>Home</span>
           </li>
           {user && (
             <li
               className={`${
-                location.pathname === "/user-dashboard" && "active"
+                location.pathname === "/user-dashboard" ? "active" : ""
               }`}
-              onClick={()=>{onSideMenuButtonClick("/user-dashboard")}}
+              onClick={() => onNavClick("/user-dashboard")}
             >
-              <Link to="/user-dashboard">Dashboard</Link>
+              <span>Dashboard</span>
             </li>
           )}
           {user && (
             <li
-              className={`${location.pathname === "/my-account" && "active"}`}
-              onClick={()=>{onSideMenuButtonClick("/my-account")}}
+              className={`${location.pathname === "/my-account" ? "active" : ""}`}
+              onClick={() => onNavClick("/my-account")}
             >
-              <Link to="/my-account">Account</Link>
+              <span>Account</span>
             </li>
           )}
           <li
-            className={`${location.pathname === "/leaderboard" && "active"}`}
-            onClick={()=>{onSideMenuButtonClick("/leaderboard")}}
+            className={`${location.pathname === "/leaderboard" ? "active" : ""}`}
+            onClick={() => onNavClick("/leaderboard")}
           >
-            <Link to="/leaderboard">Leaderbboard</Link>
+            <span>Leaderboard</span>
           </li>
           {user && (
             <li
-              className={`${location.pathname === "/orders" && "active"}`}
-              onClick={()=>{onSideMenuButtonClick("/orders")}}
+              className={`${location.pathname === "/orders" ? "active" : ""}`}
+              onClick={() => onNavClick("/orders")}
             >
-              <Link to="/orders">Orders</Link>
+              <span>Orders</span>
             </li>
           )}
           {user && (
             <li
-              className={`${location.pathname === "/query" && "active"}`}
-              onClick={()=>{onSideMenuButtonClick("/query")}}
+              className={`${location.pathname === "/query" ? "active" : ""}`}
+              onClick={() => onNavClick("/query")}
             >
-              <Link to="/query">Queries</Link>
+              <span>Queries</span>
             </li>
           )}
           {user && (
             <li
-              className={`${location.pathname === "/wallet" && "active"}`}
-              onClick={()=>{onSideMenuButtonClick("/wallet")}}
+              className={`${location.pathname === "/wallet" ? "active" : ""}`}
+              onClick={() => onNavClick("/wallet")}
             >
-              <Link to="/wallet">Wallet</Link>
+              <span>Wallet</span>
             </li>
           )}
           <li
-            className={`${location.pathname === "/games" && "active"}`}
-            onClick={()=>{onSideMenuButtonClick("/games")}}
+            className={`${location.pathname === "/games" ? "active" : ""}`}
+            onClick={() => onNavClick("/games")}
           >
-            <Link onClick={() => setSideMenu(!sideMenu)} to="/games">
-              Games
-            </Link>
+            <span>Games</span>
           </li>
           <li
-            className={`${location.pathname === "/support" && "active"}`}
-            onClick={()=>{onSideMenuButtonClick("/support")}}
+            className={`${location.pathname === "/support" ? "active" : ""}`}
+            onClick={() => onNavClick("/support")}
           >
-            <Link onClick={() => setSideMenu(!sideMenu)} to="/support">
-              Support
-            </Link>
+            <span>Support</span>
           </li>
           {!user && (
-            <div
-              className="sidemenu-action-btn logout my-4"
-              onClick={() => setSideMenu(!sideMenu)}
+            <li
+              className="sidemenu-login-btn mt-3"
+              onClick={() => onNavClick("/login")}
             >
-              <Link to="/login">Login</Link>
-            </div>
+              <span>Login</span>
+            </li>
           )}
           {user && (
             <div className="logout my-4" onClick={handleLogout}>
-              Logout
-              <LogoutIcon className="icon" />
+              <span>Logout</span>
+              <LogoutIcon className="icon ms-2" />
             </div>
           )}
         </ul>

@@ -1,12 +1,18 @@
 .backdrop {
-  position: absolute;
+  position: fixed;
   top: 0;
-  left: -100%;
+  left: 0;
   width: 100%;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.8);
-  z-index: 98;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 980;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
-.bactive {
-  left: 0;
+.backdrop.bactive {
+  opacity: 1;
+  visibility: visible;
 }
