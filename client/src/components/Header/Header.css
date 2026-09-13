@@ -9,6 +9,7 @@
 }
 .header {
   position: relative !important;
+  z-index: 1000 !important;
   box-shadow: 0 4px 20px rgba(27, 56, 32, 0.12) !important;
 }
 .header-main {
@@ -18,6 +19,7 @@
   align-items: center;
   padding: 0 30px;
   position: relative;
+  z-index: 1001;
   width: 100%;
   background: rgba(27, 56, 32, 0.96);
   backdrop-filter: blur(12px);
@@ -88,8 +90,6 @@
   transform: translateY(2px);
   box-shadow: 0 1px 0 #153219;
 }
-.request-btn {
-}
 .upgrade-btn {
   padding: 8px 14px;
   background: rgba(255, 255, 255, 0.12);
@@ -128,7 +128,7 @@
 }
 /* ================================== */
 .burger-icon .icon {
-  font-size: 40px;
+  font-size: 38px;
   cursor: pointer;
   color: #79cb84;
 }
@@ -151,7 +151,6 @@
   align-items: center;
 }
 .sub-header ul li {
-  width: 100%;
   width: auto;
 }
 .sub-header ul li a {
@@ -232,8 +231,6 @@
   border-radius: 5px;
 }
 
-/* ================================= LOGOUT TIPPY ENDS */
-
 /* ================================== */
 @media screen and (max-width: 1212px) {
   .logo h3 {
@@ -273,7 +270,7 @@
   }
   .sub-header {
     padding: 0 20px;
-    overflow-x: scroll;
+    overflow-x: auto;
   }
   .sub-header ul {
     width: 100%;

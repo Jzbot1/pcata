@@ -32,6 +32,11 @@ const Header = () => {
 
   return (
     <>
+      {/* Top-level mobile overlays outside header stacking context */}
+      <Backdrop sideMenu={sideMenu} setSideMenu={setSideMenu} />
+      <SideMenu sideMenu={sideMenu} setSideMenu={setSideMenu} />
+      <SearchContainer search={search} setSearch={setSearch} />
+
       <header className="header">
         <div className="header-main">
           {/* Mobile hamburger and logo separated */}
@@ -46,9 +51,6 @@ const Header = () => {
               ZELAN<span>STORE</span>
             </div>
           </div>
-
-          <SideMenu sideMenu={sideMenu} setSideMenu={setSideMenu} />
-          <Backdrop sideMenu={sideMenu} setSideMenu={setSideMenu} />
 
           {/* Desktop logo */}
           <div className="logo d-none d-lg-block" onClick={() => navigate("/")}>
@@ -123,7 +125,6 @@ const Header = () => {
           </div>
         </div>
       </header>
-      <SearchContainer search={search} setSearch={setSearch} />
     </>
   );
 };
