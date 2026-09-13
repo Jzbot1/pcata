@@ -1,7 +1,7 @@
 .explore-products-container {
   padding: 70px 50px;
   padding-left: 120px;
-  color: var(--text-color);
+  color: #111111;
   background: transparent;
   display: flex;
   justify-content: space-between;
@@ -20,13 +20,14 @@
   margin-bottom: 25px;
 }
 .titlee h2 {
-  font-weight: 700;
+  font-weight: 800;
   font-size: 36px;
-  color: var(--p);
+  color: #111111 !important;
   letter-spacing: -0.5px;
 }
 .titlee span {
-  color: var(--s);
+  color: #1b3820;
+  font-weight: 700;
 }
 .game-cont {
   padding: 15px;
@@ -37,7 +38,7 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   position: relative;
@@ -53,7 +54,7 @@
 .game:hover {
   transform: translateY(-6px);
   box-shadow: 0 16px 32px rgba(27, 56, 32, 0.14);
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.9);
 }
 .game img {
   position: absolute;
@@ -71,14 +72,14 @@
 .game h5 {
   font-size: 15px;
   text-align: center;
-  font-weight: 700;
-  color: var(--p);
+  font-weight: 800;
+  color: #111111 !important;
   margin-top: 5px;
 }
 .game span {
-  font-size: 11px;
-  color: var(--s);
-  opacity: 0.85;
+  font-size: 12px;
+  color: #27552d;
+  font-weight: 700;
 }
 .buy-now {
   background: var(--bg-button);
@@ -87,7 +88,7 @@
   border: none;
   padding: 8px 28px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   border-radius: 100px;
   margin-top: 15px;
   box-shadow: 0 4px 0 #143519, 0 6px 14px rgba(20, 53, 25, 0.25);
@@ -113,18 +114,18 @@
   display: flex;
   gap: 20px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
 }
 .game-tabs span {
-  color: var(--s);
+  color: #27552d;
   cursor: pointer;
   padding: 4px 8px;
   transition: color 0.2s ease;
 }
 .game-tabs span.active {
-  color: var(--p);
+  color: #111111;
   position: relative;
-  font-weight: 700;
+  font-weight: 800;
 }
 .game-tabs span.active::before {
   content: "";
@@ -135,7 +136,7 @@
   width: 100%;
   height: 3px;
   border-radius: 2px;
-  background-color: var(--s);
+  background-color: #1b3820;
 }
 
 .mobile-game-cont {
@@ -143,11 +144,43 @@
   overflow-x: auto;
 }
 
-/* ===================  */
+/* =================== FILTER TABS */
 .explore-products-container .game-filter-tabs {
   width: 100%;
   padding: 0 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
 }
+.explore-products-container .game-filter-tabs button {
+  background: rgba(255, 255, 255, 0.85);
+  color: #111111;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 10px 22px;
+  border-radius: 25px;
+  border: 1.5px solid rgba(45, 85, 51, 0.25);
+  box-shadow: 0 3px 0 rgba(45, 85, 51, 0.2);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.explore-products-container .game-filter-tabs button:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 rgba(45, 85, 51, 0.25);
+}
+.explore-products-container .game-filter-tabs button.active {
+  background: var(--bg-button);
+  color: #ffffff;
+  border-color: #143519;
+  box-shadow: 0 4px 0 #143519, 0 6px 14px rgba(20, 53, 25, 0.25);
+}
+.explore-products-container .game-filter-tabs button:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #143519;
+}
+
 .explore-products-container .game-container {
   display: flex;
   justify-content: center;

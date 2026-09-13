@@ -32,14 +32,14 @@ const Products = ({ title, homeLabel }) => {
 
   const fetchCategories = async () => {
     try {
-    const { data } = await axios.get("/api/categories", {
+      const { data } = await axios.get("/api/categories", {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
       });
-    setCategories(Array.isArray(data) ? data : []);
+      setCategories(Array.isArray(data) ? data : []);
     } catch (error) {
-    setCategories([]); // Ensure it remains an array
+      setCategories([]); // Ensure it remains an array
     }
   };
 
@@ -60,12 +60,12 @@ const Products = ({ title, homeLabel }) => {
             if (filteredProducts?.length === 0) return null;
 
             return (
-              <div key={category._id} className="product-title">
+              <div key={category._id} className="product-title mb-4">
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h2 className="text-light mb-0">{category.name}</h2> {/* Show category name */}
-                  <div className="center gap-1" onClick={()=>{navigate("/games")}}>
-                    <SportsEsportsIcon className="text-light icon" />
-                    <span className="text-light">View All</span>
+                  <h2 className="category-title-text mb-0">{category.name}</h2>
+                  <div className="center gap-1 view-all-link" onClick={() => { navigate("/games"); }}>
+                    <SportsEsportsIcon className="icon" />
+                    <span>View All</span>
                   </div>
                 </div>
                 
@@ -80,7 +80,7 @@ const Products = ({ title, homeLabel }) => {
                         <img src={`https://zelanstore.com/${product?.image}`} alt={product?.name} />
                       </div>
                       <div className="product-name center">
-                        <p className="text-light mb-0 mt-1">{product?.name}</p>
+                        <p className="product-card-title mb-0 mt-1">{product?.name}</p>
                       </div>
                     </div>
                   ))}
