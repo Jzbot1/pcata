@@ -1,12 +1,12 @@
 .hero-container {
-  padding: 50px 100px;
+  padding: 30px 100px;
   position: relative;
 }
 
 .hero-container img {
   transition: 0.3s all ease-out;
-  border-radius: 15px;
-  height: 210px;
+  border-radius: 18px;
+  height: 220px;
   object-fit: cover;
 }
 
@@ -15,34 +15,39 @@
 }
 
 .hero-container img:hover {
-  scale: 1.02;
+  transform: scale(1.01);
 }
 
 .hero-slider-btns .icon {
-  font-size: 45px;
+  font-size: 38px;
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   border-radius: 100px;
-  border: 2px solid #fff;
-  background-color: #0000007f;
-  color: #fff;
-  padding: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--p);
+  padding: 6px;
   cursor: pointer;
   z-index: 10;
+  box-shadow: 0 4px 15px rgba(27, 56, 32, 0.15);
+  transition: all 0.2s ease;
 }
 
 .hero-slider-btns .icon:hover {
-  background-color: #fff;
-  color: #000;
+  background: var(--bg-button);
+  color: #fff;
+  transform: translateY(-50%) scale(1.08);
 }
 
 .hero-slider-btns .arrow-left {
-  left: 4%;
+  left: 3%;
 }
 
 .hero-slider-btns .arrow-right {
-  right: 4%;
+  right: 3%;
 }
 
 .banner-content {
@@ -52,42 +57,45 @@
 
 .banner-title {
   font-size: 24px;
-  font-weight: bold;
+  font-weight: 700;
   color: #fff;
   position: absolute;
   bottom: 20px;
   left: 20px;
   z-index: 1;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
-  background: rgba(0, 0, 0, 0.5); /* Adding a background to the title */
-  padding: 5px 10px;
-  border-radius: 5px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  background: rgba(20, 42, 24, 0.75);
+  backdrop-filter: blur(8px);
+  padding: 6px 14px;
+  border-radius: 10px;
 }
 
 .banner-heading {
-  font-size: 18px;
+  font-size: 16px;
+  font-weight: 600;
   color: #fff;
   position: absolute;
-  bottom: 50px;
+  bottom: 60px;
   left: 20px;
   z-index: 1;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
-  background: rgba(252, 62, 62, 0.5); /* Adding a background to the heading */
-  padding: 5px 10px;
-  border-radius: 5px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  background: rgba(45, 85, 51, 0.8);
+  backdrop-filter: blur(8px);
+  padding: 4px 12px;
+  border-radius: 8px;
 }
 
 .banner-img {
-  border: 3px solid rgba(255, 255, 255, 0.6);
-  border-radius: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 0px 8px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 30px rgba(27, 56, 32, 0.12);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .banner-img:hover {
-  transform: scale(1.02);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  transform: scale(1.01);
+  box-shadow: 0 14px 36px rgba(27, 56, 32, 0.18);
 }
 
 .banner-link {
@@ -96,15 +104,15 @@
 
 @media screen and (max-width: 992px) {
   .hero-container {
-    padding: 0;
+    padding: 10px;
   }
 
   .banner-title {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .banner-heading {
-    font-size: 16px;
+    font-size: 14px;
   }
 }
 
@@ -114,11 +122,11 @@
   }
 
   .banner-title {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .banner-heading {
-    font-size: 14px;
+    font-size: 13px;
   }
   
   .hero-slider-btns .icon {

@@ -3,15 +3,26 @@
   color: var(--t);
 }
 .theme-btn {
-  background-color: var(--t);
-  padding: 20px;
+  background: var(--bg-button);
+  padding: 16px 24px;
   font-size: 16px;
   font-weight: 600;
   border-radius: 10px;
   outline: transparent;
   border: transparent;
-  color: #000;
+  color: #fff;
   text-transform: uppercase;
+  box-shadow: var(--btn-3d-shadow);
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+.theme-btn:hover {
+  background: var(--bg-button-hover);
+  transform: translateY(-1px);
+}
+.theme-btn:active {
+  transform: translateY(3px);
+  box-shadow: var(--btn-3d-shadow-active);
 }
 .loader-container {
   display: flex;
@@ -37,12 +48,12 @@
   position: absolute;
   inset: 0px;
   border-radius: 50%;
-  border: 5px solid #ebef29;
+  border: 5px solid #3b7441;
   animation: prixClipFix 2s linear infinite;
 }
 .loader::after {
   transform: rotate3d(90, 90, 0, 180deg);
-  border-color: #000;
+  border-color: #1b3820;
 }
 
 /* ================ */

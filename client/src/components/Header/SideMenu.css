@@ -15,7 +15,8 @@
   justify-content: start;
   padding-bottom: 200px;
   position: relative;
-  background-color: #000;
+  background: rgba(27, 56, 32, 0.98);
+  backdrop-filter: blur(16px);
   padding: 60px 30px;
 }
 .sidemenu .close-icon {
@@ -23,23 +24,27 @@
   top: 20px;
   right: 20px;
   font-size: 35px;
-  color: #fff;
+  color: #79cb84;
+  cursor: pointer;
 }
 .sidemenu ul li {
   margin: 15px 0;
-  padding: 10px;
+  padding: 12px;
   border-radius: 10px;
-  background-color: #ffbaba;
-  
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.2s ease;
 }
-.sidemenu ul li a{
-  color: black !important;
+.sidemenu ul li a {
+  color: #e6f3e4 !important;
 }
 .sidemenu ul li.active {
-  background-color: var(--t);
-  a {
-    color: #ffffff !important;
-  }
+  background: linear-gradient(180deg, #3d7545 0%, #26542c 100%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+.sidemenu ul li.active a {
+  color: #ffffff !important;
 }
 .sidemenu ul li a {
   color: #fff;
@@ -47,7 +52,7 @@
 }
 .sidemenu .logout {
   text-align: end;
-  color: #ebef29;
+  color: #79cb84;
   cursor: pointer;
 }
 .sidemenu .logout:hover {
@@ -63,7 +68,7 @@
   height: 80px;
   border-radius: 100px;
   object-fit: cover;
-  border: 3px solid #26bd68;
+  border: 3px solid #79cb84;
   display: block;
   margin: 0 auto;
 }

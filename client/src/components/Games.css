@@ -1,9 +1,8 @@
 .explore-products-container {
-  /* margin-top: 50px; */
   padding: 70px 50px;
   padding-left: 120px;
-  color: #fff;
-  /* background-color: var(--p); */
+  color: var(--text-color);
+  background: transparent;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -18,14 +17,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 .titlee h2 {
-  font-weight: 500;
-  font-size: 40px;
+  font-weight: 700;
+  font-size: 36px;
+  color: var(--p);
+  letter-spacing: -0.5px;
 }
 .titlee span {
-  color: var(--t);
+  color: var(--s);
 }
 .game-cont {
   padding: 15px;
@@ -36,14 +37,23 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  background-color: #32393b;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 18px;
   margin-top: 50px;
   padding-top: 60px;
   text-align: center;
   min-height: 200px;
+  box-shadow: 0 10px 25px rgba(27, 56, 32, 0.08);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.game:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px rgba(27, 56, 32, 0.14);
+  background: rgba(255, 255, 255, 0.85);
 }
 .game img {
   position: absolute;
@@ -53,57 +63,84 @@
   width: 100px;
   height: 100px;
   object-fit: cover;
-  border-radius: 15px;
+  border-radius: 18px;
   margin-top: -50px;
+  box-shadow: 0 8px 20px rgba(27, 56, 32, 0.16);
+  border: 2px solid rgba(255, 255, 255, 0.9);
 }
 .game h5 {
-  font-size: 14px;
+  font-size: 15px;
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--p);
+  margin-top: 5px;
 }
 .game span {
-  font-size: 10px;
-  color: #ddd;
+  font-size: 11px;
+  color: var(--s);
+  opacity: 0.85;
 }
 .buy-now {
-  background-color: var(--t);
-  outline: transparent;
-  border: transparent;
-  padding: 5px 30px;
+  background: var(--bg-button);
+  color: #fff;
+  outline: none;
+  border: none;
+  padding: 8px 28px;
   font-size: 14px;
+  font-weight: 600;
   border-radius: 100px;
   margin-top: 15px;
+  box-shadow: 0 4px 0 #143519, 0 6px 14px rgba(20, 53, 25, 0.25);
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.buy-now:hover {
+  box-shadow: 0 4px 0 #143519, 0 8px 18px rgba(20, 53, 25, 0.35);
+  transform: translateY(-1px);
+}
+.buy-now:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #143519, 0 3px 6px rgba(20, 53, 25, 0.2);
 }
 .buy-now .icon {
   font-size: 14px;
 }
 .game-tabs {
   display: flex;
-  gap: 15px;
-  font-size: 14px;
+  gap: 20px;
+  font-size: 15px;
+  font-weight: 600;
 }
 .game-tabs span {
-  color: #ddd;
+  color: var(--s);
   cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s ease;
 }
 .game-tabs span.active {
-  color: var(--t);
+  color: var(--p);
   position: relative;
+  font-weight: 700;
 }
 .game-tabs span.active::before {
   content: "";
   position: absolute;
-  bottom: -2px;
+  bottom: -4px;
   left: 50%;
   transform: translateX(-50%);
-  width: 50px;
-  height: 2px;
-  background-color: var(--t);
+  width: 100%;
+  height: 3px;
+  border-radius: 2px;
+  background-color: var(--s);
 }
 
 .mobile-game-cont {
   display: flex;
-  overflow-x: scroll;
+  overflow-x: auto;
 }
 
 /* ===================  */
@@ -132,7 +169,7 @@
 @media screen and (max-width: 600px) {
   .popular-games h5,
   .popular-games span {
-    font-size: 15px;
+    font-size: 14px;
   }
   .games-list {
     gap: 20px;
@@ -144,7 +181,7 @@
     font-size: 10px;
   }
   .game-tabs {
-    font-size: 12px;
+    font-size: 13px;
   }
   .explore-products-container .game-container .game-cont {
     width: 150px;
@@ -160,10 +197,11 @@
     height: 70px;
   }
   .game h5 {
-    font-size: 10px;
+    font-size: 11px;
   }
   .buy-now {
-    font-size: 10px;
+    font-size: 11px;
+    padding: 6px 18px;
     margin-top: 0;
   }
   .game-tabs {
@@ -176,7 +214,7 @@
 
 @media screen and (max-width: 500px) {
   .explore-products-container {
-    padding: 50px 10px;
+    padding: 30px 10px;
     flex-wrap: wrap;
     margin-top: 0;
   }
@@ -190,7 +228,7 @@
     margin: 0;
   }
   .popular-games span {
-    font-size: 15px;
+    font-size: 14px;
   }
   .popular-games .mobile-game-cont {
     padding: 0px;
@@ -212,17 +250,17 @@
     font-size: 8px;
   }
   .buy-now {
-    padding: 5px 20px;
-    font-size: 12px;
+    padding: 5px 14px;
+    font-size: 11px;
   }
   .game-tabs {
-    font-size: 12px;
+    font-size: 11px;
   }
   .explore-products-container .game-filter-tabs {
     width: 100%;
     display: flex;
     flex-wrap: nowrap;
-    overflow-x: scroll;
+    overflow-x: auto;
   }
   .explore-products-container .game-filter-tabs button {
     width: 250px;

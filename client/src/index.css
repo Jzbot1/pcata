@@ -1,12 +1,25 @@
 @import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
 
 :root {
-  --p: #000;
-  --s: #333;
-  --t: #dc3545;
-  --bg: linear-gradient(180deg, #dc3545 20%, #ab0909 100%);
-  --bg-button: linear-gradient(135deg, #a71423, #ff4d4d);
+  --p: #1b3820; /* Deep botanical forest green */
+  --s: #2d5533; /* Medium deep forest green */
+  --t: #3b7441; /* Vibrant leaf green */
+  --t-light: #5a9661; /* Light olive/sage */
+  --t-accent: #78a974; /* Soft sage accent */
+  --bg: linear-gradient(180deg, #d8ead2 0%, #eaf4e6 40%, #f4f9f1 100%); /* Organic sage green background */
+  --bg-subtle: #ebf4e8;
+  --bg-glass: rgba(255, 255, 255, 0.75);
+  --bg-glass-card: rgba(255, 255, 255, 0.72);
+  --border-glass: rgba(255, 255, 255, 0.85);
+  --shadow-glass: 0 8px 24px rgba(27, 56, 32, 0.08);
+  --bg-button: linear-gradient(180deg, #3d7545 0%, #26542c 100%); /* 3D forest green button */
+  --bg-button-hover: linear-gradient(180deg, #46844f 0%, #2c6033 100%);
+  --btn-3d-shadow: 0 4px 0 #143519, 0 6px 14px rgba(20, 53, 25, 0.28);
+  --btn-3d-shadow-active: 0 1px 0 #143519, 0 2px 4px rgba(20, 53, 25, 0.2);
+  --text-dark: #1b3820;
+  --text-muted: #537557;
 }
+
 * {
   padding: 0;
   margin: 0;
@@ -15,29 +28,87 @@
   list-style: none !important;
   text-decoration: none !important;
 }
+
+body {
+  background: var(--bg);
+  min-height: 100vh;
+  color: var(--text-dark);
+}
+
 ul {
   margin: 0 !important;
   padding: 0 !important;
 }
+
 .no-wrap {
   white-space: nowrap;
 }
+
 .center {
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .between {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .popp {
   font-family: "Poppins", sans-serif !important;
 }
+
 .caveat {
   font-family: "Caveat", cursive;
   font-weight: 500;
+}
+
+/* 3D Button Style */
+.btn-3d,
+.buy-now,
+.theme-btn,
+.register-btn,
+.action-3d-btn {
+  background: linear-gradient(180deg, #3d7545 0%, #26542c 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 0 #143519, 0 6px 14px rgba(20, 53, 25, 0.28) !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.2s ease !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.btn-3d:hover,
+.buy-now:hover,
+.theme-btn:hover,
+.register-btn:hover,
+.action-3d-btn:hover {
+  background: linear-gradient(180deg, #46844f 0%, #2c6033 100%) !important;
+  box-shadow: 0 4px 0 #143519, 0 8px 18px rgba(20, 53, 25, 0.35) !important;
+  transform: translateY(-1px);
+}
+
+.btn-3d:active,
+.buy-now:active,
+.theme-btn:active,
+.register-btn:active,
+.action-3d-btn:active {
+  transform: translateY(3px) !important;
+  box-shadow: 0 1px 0 #143519, 0 2px 4px rgba(20, 53, 25, 0.2) !important;
+}
+
+/* Glassmorphism Card Style */
+.glass-surface {
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  box-shadow: 0 8px 24px rgba(27, 56, 32, 0.08) !important;
+  border-radius: 16px !important;
 }
 
 @media screen and (min-width: 993px) {
@@ -47,6 +118,6 @@ ul {
 
   ::-webkit-scrollbar-thumb {
     border-radius: 5px;
-    background: linear-gradient(#333, #000);
+    background: linear-gradient(#2d5533, #1b3820);
   }
 }

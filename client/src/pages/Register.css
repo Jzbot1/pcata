@@ -7,62 +7,78 @@
 .form-container {
   padding: 40px;
   background: rgba(255, 255, 255, 0.8);
-  border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(27, 56, 32, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
 }
 
 .login-form h1 {
   font-size: 28px;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: var(--p);
   margin-bottom: 30px;
 }
 
 .form-fields input {
   width: 100%;
   padding: 15px;
-  background-color: transparent;
-  border: 1px solid rgba(0, 0, 0, 0.3);
-  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1.5px solid rgba(45, 85, 51, 0.3);
+  border-radius: 12px;
   margin-bottom: 20px;
-  color: #333;
+  color: var(--p);
   font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.form-fields input:focus {
+  outline: none;
+  border-color: var(--s);
+  box-shadow: 0 0 0 3px rgba(45, 85, 51, 0.15);
 }
 
 .form-fields input::placeholder {
-  color: #aaa;
+  color: #718073;
 }
 
 .login-btn {
   width: 100%;
   padding: 16px;
-  background-color: var(--p);
+  background: var(--bg-button);
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  box-shadow: 0 4px 0 #143519, 0 6px 14px rgba(20, 53, 25, 0.25);
+  transition: all 0.15s ease;
 }
 
 .login-btn:hover {
-  opacity: 0.9;
+  box-shadow: 0 5px 0 #143519, 0 8px 18px rgba(20, 53, 25, 0.35);
+  transform: translateY(-2px);
+}
+
+.login-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #143519;
 }
 
 .forgot-pass {
   font-size: 14px;
-  color: #333;
+  color: var(--p);
 }
 
 .forgot-pass a {
-  color: var(--p);
+  color: var(--s);
+  font-weight: 600;
   text-decoration: underline;
 }
 
 .forgot-pass a:hover {
-  color: var(--t);
+  color: var(--p);
 }
 
 .auth-divider {
@@ -70,16 +86,16 @@
   align-items: center;
   text-align: center;
   margin: 20px 0;
-  color: #888;
+  color: var(--s);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .auth-divider::before,
 .auth-divider::after {
   content: "";
   flex: 1;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid rgba(45, 85, 51, 0.2);
 }
 
 .auth-divider span {
@@ -109,19 +125,26 @@
   justify-content: center;
   gap: 12px;
   background-color: #fff;
-  color: #3c4043;
-  border: 1px solid #dadce0;
-  border-radius: 8px;
+  color: var(--p);
+  border: 1.5px solid rgba(45, 85, 51, 0.25);
+  border-radius: 12px;
   padding: 12px 16px;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 3px 0 rgba(45, 85, 51, 0.2), 0 4px 10px rgba(27, 56, 32, 0.05);
+  transition: all 0.15s ease;
 }
 
 .custom-google-btn:hover {
-  background-color: #f8f9fa;
-  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3);
+  background-color: #f8faf8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 rgba(45, 85, 51, 0.25), 0 6px 14px rgba(27, 56, 32, 0.08);
+}
+
+.custom-google-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(45, 85, 51, 0.2);
 }
 
 .custom-google-btn svg {
@@ -148,4 +171,3 @@
     font-size: 16px;
   }
 }
-

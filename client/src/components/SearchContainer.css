@@ -4,13 +4,15 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #000;
-  transition: 0.5s all ease;
+  background-color: rgba(234, 244, 230, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 30px;
   gap: 20px;
-  z-index: 99;
+  z-index: 999;
   opacity: 0;
 }
 .search-container.active {
@@ -21,30 +23,40 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 15px;
 }
 .search-tool .icon {
-  font-size: 35px;
-  color: #ddd;
+  font-size: 32px;
+  color: var(--p);
+  cursor: pointer;
 }
 .search-tool input {
-  width: 80%;
-  padding: 15px;
-  border: transparent;
-  outline: transparent;
-  border-bottom: 1px solid grey;
+  width: 70%;
+  padding: 16px 24px;
+  border-radius: 30px;
+  border: 1.5px solid rgba(45, 85, 51, 0.3);
+  outline: none;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--p);
+  font-size: 16px;
+  box-shadow: 0 4px 15px rgba(27, 56, 32, 0.08);
+}
+.search-tool input:focus {
+  border-color: var(--s);
+  box-shadow: 0 6px 20px rgba(27, 56, 32, 0.15);
 }
 .search-box {
   width: 90%;
   margin: 0 auto;
-  height: 100vh;
+  height: calc(100vh - 120px);
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
-  overflow-y: scroll;
+  overflow-y: auto;
+  gap: 15px;
 }
 .search-product {
-  /* width: 20% !important; */
   margin: 0 10px 20px 10px !important;
 }
 
@@ -52,21 +64,21 @@
   .search-container {
     top: 0;
     left: -100%;
-    padding: 20px 0;
+    padding: 20px 10px;
     z-index: 999;
-    background-color: #fff !important;
   }
   .search-container.active {
     left: 0;
   }
-  .search-container .icon {
+  .search-tool .icon {
     font-size: 25px;
   }
-  .search-container input {
-    padding: 10px;
+  .search-tool input {
+    width: 80%;
+    padding: 12px 18px;
   }
   .search-product {
-    width: 40% !important;
-    margin: 10px !important;
+    width: 45% !important;
+    margin: 5px !important;
   }
 }

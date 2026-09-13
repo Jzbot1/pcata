@@ -13,40 +13,54 @@
   width: 20%;
   display: flex;
   flex-direction: column;
-  background-color: #eee;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
   padding: 20px;
   min-height: 100vh;
+  border-radius: 16px;
 }
 .dash-menu .menu-item {
-  margin: 20px 0;
-  padding: 10px;
+  margin: 15px 0;
+  padding: 12px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
 }
-/* .active {
-  background-color: white;
-  border-radius: 5px;
-} */
 .dash-menu .menu-item a {
   margin-left: 10px;
-  color: black;
+  color: var(--p);
+  font-weight: 600;
 }
 .dash-right {
   width: 80%;
   padding: 20px;
-  background-color: #f7f7f7;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
 }
 
 .dashboard-container {
-  padding: 30px 100px;
+  padding: 40px 100px;
   width: 100%;
   display: flex;
   flex-wrap: wrap;
   background: var(--bg);
+  min-height: 80vh;
+  gap: 24px;
 }
 .dashboard-menu {
-  width: 30%;
-  padding: 20px;
-  background-color: var(--p);
-  color: #fff;
+  width: 28%;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(27, 56, 32, 0.06);
+  color: var(--p);
 }
 .dashboard-menu ul {
   display: flex;
@@ -54,31 +68,47 @@
   gap: 10px;
 }
 .dashboard-menu ul li {
-  padding: 10px;
-  padding-left: 10px;
+  padding: 12px 16px;
   cursor: pointer;
-  transition: 0.5s all ease;
-  border-radius: 5px;
-  border: 1px solid rgba(128, 128, 128, 0.416);
+  transition: all 0.2s ease;
+  border-radius: 12px;
+  border: 1.5px solid rgba(45, 85, 51, 0.15);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--p);
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(27, 56, 32, 0.04);
 }
 .dashboard-menu ul li.active {
-  background-color: var(--t);
-  border-radius: 5px;
-  color: #000;
+  background: var(--bg-button);
+  color: #fff;
+  border-color: #143519;
+  box-shadow: 0 4px 0 #143519, 0 6px 14px rgba(20, 53, 25, 0.25);
 }
-.dashboard-menu ul li:hover {
-  background-color: var(--t);
-  color: #000;
+.dashboard-menu ul li.active a {
+  color: #fff;
+}
+.dashboard-menu ul li:hover:not(.active) {
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(27, 56, 32, 0.08);
 }
 .dashboard-menu ul li a {
-  color: #ddd;
+  color: inherit;
+  display: block;
 }
 
 /* CONTENT  */
 .dashboard-content {
-  width: 70%;
-  padding: 0 10px;
+  width: 68%;
+  padding: 24px;
   padding-bottom: 50px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(27, 56, 32, 0.06);
+  color: var(--p);
 }
 
 .tp {
@@ -88,22 +118,21 @@
   position: absolute;
   font-size: 10px;
   top: 0;
-  color: red;
-  font-weight: 500;
+  color: #dc2626;
+  font-weight: 700;
 }
 
 @media screen and (max-width: 992px) {
   .dash-right {
     width: 100%;
   }
-  .mobile-menu {
-  }
   .mobile-menu .menu-icon {
     font-size: 40px;
-    color: #222f3e;
+    color: var(--p);
   }
   .mobile-menu-container {
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(14px);
     position: fixed;
     top: 80px;
     left: -100%;
@@ -119,26 +148,28 @@
   .mobile-menu-container .close-icon {
     margin-left: 10px;
     font-size: 35px;
-    color: #333;
+    color: var(--p);
     cursor: pointer;
-    border: 1px solid #333;
+    border: 1px solid var(--p);
     margin-bottom: 30px;
   }
   .mobile-menu-container .menu-item,
   .mobile-menu-container a {
-    color: #333;
+    color: var(--p);
     margin: 20px 10px;
+    font-weight: 600;
   }
 
   .dashboard-container {
-    padding: 0;
+    padding: 20px 10px;
+    gap: 15px;
   }
   .dashboard-menu {
     width: 100%;
   }
   .dashboard-content {
     width: 100%;
-    margin-top: 30px;
-    overflow-x: scroll;
+    margin-top: 15px;
+    overflow-x: auto;
   }
 }

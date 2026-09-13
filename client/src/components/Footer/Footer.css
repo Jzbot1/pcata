@@ -1,15 +1,16 @@
 .before-footer-support {
   padding: 50px 100px;
-  background-color: #000;
+  background-color: #17321a;
   color: #fff;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 .before-footer-support span {
-  color: var(--t);
+  color: #79cb84;
 }
 .support-options {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
 }
 .support-options .column {
   display: flex;
@@ -20,8 +21,9 @@
 }
 .support-options .options {
   padding: 15px;
-  background-color: var(--s);
-  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -29,32 +31,35 @@
   color: #fff;
   width: 12%;
   cursor: pointer;
-  transition: 0.5s all ease;
-  &:hover {
-    background-color: var(--t);
-    span {
-      color: #000;
-    }
-    .icon {
-      color: #000;
-    }
-  }
+  transition: all 0.25s ease;
+  backdrop-filter: blur(8px);
+}
+.support-options .options:hover {
+  background: linear-gradient(180deg, #3d7545 0%, #26542c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.support-options .options:hover span,
+.support-options .options:hover .icon {
+  color: #fff;
 }
 .support-options .options .icon {
-  font-size: 50px;
+  font-size: 44px;
   margin-bottom: 10px;
+  color: #79cb84;
 }
 .support-options .options span {
-  color: #fff;
+  color: #e6f3e4;
   font-size: 14px;
+  font-weight: 500;
 }
 
 /* ==================== SUBSCRIBE */
 .footer-subscribe {
   padding: 50px 100px;
-  background-color: #000;
+  background-color: #1a381d;
   color: #fff;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -62,11 +67,13 @@
 }
 .footer-subscribe span {
   text-transform: uppercase;
+  color: #79cb84;
+  letter-spacing: 1px;
 }
 .footer-subscribe h2 {
   margin: 0;
   margin-bottom: 10px;
-  font-weight: 600;
+  font-weight: 700;
 }
 .social {
   display: flex;
@@ -74,21 +81,27 @@
 }
 .social .icon {
   font-size: 30px;
-  color: #fff;
+  color: #e6f3e4;
+  transition: color 0.2s ease;
+}
+.social .icon:hover {
+  color: #79cb84;
 }
 /* ==================== FOOTER */
 
 .footer-container {
   overflow: hidden;
   padding: 50px 100px;
-  border-top: 1px solid rgba(0, 0, 0, 0.2);
-  background-color: #000;
-  color: #fff;
+  background-color: #17321a;
+  color: #cbe3c8;
 }
 .footer-container .footer-logo {
   font-size: 25px;
-  font-weight: 600;
+  font-weight: 700;
   color: #fff;
+}
+.footer-container .footer-logo span {
+  color: #79cb84;
 }
 .footer-container .social-media-links {
   display: flex;
@@ -96,29 +109,34 @@
 }
 .quick-links h6 {
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 18px;
 }
 .social-media-links a {
   color: #fff;
-  background-color: #dc3545;
-  border-radius: 20px;
+  background: linear-gradient(180deg, #3d7545 0%, #26542c 100%);
+  border-radius: 50%;
   padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 .footer-container ul {
   padding: 0;
 }
 .footer-container ul li {
-  margin: 5px 0;
+  margin: 6px 0;
 }
 .footer-container ul li a {
-  font-size: 16px;
+  font-size: 15px;
   position: relative;
   cursor: pointer;
-  color: #ddd;
+  color: #cbe3c8;
+  transition: color 0.2s ease;
 }
 .footer-container ul li a:hover {
-  color: var(--t);
+  color: #79cb84;
 }
 .social-links {
   padding: 10px;
@@ -126,7 +144,7 @@
 .social-icons .icon {
   font-size: 20px;
   margin: 0 5px;
-  color: #333;
+  color: #e6f3e4;
 }
 
 .mobile-sticky-footer {
@@ -134,10 +152,12 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  background-color: #fff;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  background: rgba(27, 56, 32, 0.96);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.15);
   padding: 10px 0;
   z-index: 99;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 .mobile-sticky-footer ul {
   display: flex;
@@ -149,12 +169,12 @@
   cursor: pointer;
 }
 .mobile-sticky-footer ul li a {
-  color: #ebef29;
+  color: #cbe3c8;
   font-size: 12px;
 }
 .mobile-sticky-footer li.active,
 .mobile-sticky-footer li a.active {
-  color: #26bd68;
+  color: #79cb84 !important;
 }
 
 .wa-icon-cont {
