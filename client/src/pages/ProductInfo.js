@@ -178,30 +178,35 @@ const ProductInfo = () => {
   }, []);
 
   async function handleCheckPlayer() {
-    if (userId === "" || zoneId === "") {
-      return message.error(
-        `${userId === "" ? "Enter User ID" : "Enter (   Zone ID   )"}`
-      );
+    if (!userId || !userId.trim()) {
+      return message.error("Please enter User ID");
+    }
+    if (product?.fields === "2" && (!zoneId || !zoneId.trim())) {
+      return message.error("Please enter Zone ID");
     }
     try {
-      // setLoading(true);
       const object = {
-        userid: userId,
-        zoneid: zoneId,
+        userid: userId.trim(),
+        zoneid: zoneId.trim(),
         apiName: product?.apiName,
+        region: product?.region,
+        gameName: product?.gameName,
+        name: product?.name,
       };
       setLoading(true);
       const res = await axios.post("/api/payment/get-role", object);
       if (res.data.success) {
-        message.success(`${res.data.message?.toUpperCase()} : ${res.data.username}`)
+        message.success(`Verified: ${res.data.username}`);
         setPlayerCheck(res.data.username);
         setLoading(false);
       } else {
-        message.error(res.data.message);
+        setPlayerCheck(null);
+        message.error(res.data.message || "Invalid player details");
         setLoading(false);
       }
     } catch (error) {
-      message.error("something went wrong in check username");
+      setPlayerCheck(null);
+      message.error("Something went wrong while checking username");
       console.log(error);
       setLoading(false);
     }
@@ -751,7 +756,10 @@ const ProductInfo = () => {
                     type="text"
                     name="userId"
                     placeholder={product?.tagOne}
-                    onChange={(e) => setUserId(e.target.value)}
+                    onChange={(e) => {
+                      setUserId(e.target.value);
+                      if (playerCheck) setPlayerCheck(null);
+                    }}
                     value={userId}
                   />
                 </div>
@@ -763,7 +771,10 @@ const ProductInfo = () => {
                       type="text"
                       name="userId"
                       placeholder={product?.tagOne}
-                      onChange={(e) => setUserId(e.target.value)}
+                      onChange={(e) => {
+                        setUserId(e.target.value);
+                        if (playerCheck) setPlayerCheck(null);
+                      }}
                       value={userId}
                     />
                   </div>
@@ -772,7 +783,10 @@ const ProductInfo = () => {
                     type="text"
                     name="zoneid"
                     placeholder={product?.tagTwo}
-                    onChange={(e) => setZoneId(e.target.value)}
+                    onChange={(e) => {
+                      setZoneId(e.target.value);
+                      if (playerCheck) setPlayerCheck(null);
+                    }}
                     value={zoneId}
                   />
                 </>
@@ -785,14 +799,20 @@ const ProductInfo = () => {
                         type="text"
                         name="userId"
                         placeholder={`${product?.tagOne}`}
-                        onChange={(e) => setUserId(e.target.value)}
+                        onChange={(e) => {
+                          setUserId(e.target.value);
+                          if (playerCheck) setPlayerCheck(null);
+                        }}
                         value={userId}
                       />
                     </div>
                     <select
                       name="zoneId"
                       className="form-select player-tag"
-                      onChange={(e) => setZoneId(e.target.value)}
+                      onChange={(e) => {
+                        setZoneId(e.target.value);
+                        if (playerCheck) setPlayerCheck(null);
+                      }}
                     >
                       <option value="">Select Server</option>
                       {product?.tagTwo?.split("+")?.map((item, index) => {

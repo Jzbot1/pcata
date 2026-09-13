@@ -115,8 +115,50 @@ const AdminDashboard = () => {
     }
   };
 
+  const isToday = (dateString) => {
+    if (!dateString) return false;
+    const date = new Date(dateString);
+    const now = new Date();
+    return (
+      date.getDate() === now.getDate() &&
+      date.getMonth() === now.getMonth() &&
+      date.getFullYear() === now.getFullYear()
+    );
+  };
+
+  const isThisMonth = (dateString) => {
+    if (!dateString) return false;
+    const date = new Date(dateString);
+    const now = new Date();
+    return (
+      date.getMonth() === now.getMonth() &&
+      date.getFullYear() === now.getFullYear()
+    );
+  };
+
+  const todaySum = orders
+    ?.filter(
+      (item) =>
+        item?.status?.toLowerCase() === "success" && isToday(item?.createdAt)
+    )
+    .reduce((acc, order) => {
+      const price = parseFloat(order.price);
+      return !isNaN(price) ? acc + price : acc;
+    }, 0) || 0;
+
+  const thisMonthSum = orders
+    ?.filter(
+      (item) =>
+        item?.status?.toLowerCase() === "success" &&
+        isThisMonth(item?.createdAt)
+    )
+    .reduce((acc, order) => {
+      const price = parseFloat(order.price);
+      return !isNaN(price) ? acc + price : acc;
+    }, 0) || 0;
+
   const totalSum = orders
-    ?.filter((item) => item.status === "success")
+    ?.filter((item) => item?.status?.toLowerCase() === "success")
     .reduce((acc, order) => {
       const price = parseFloat(order.price);
       if (!isNaN(price)) {
@@ -125,15 +167,14 @@ const AdminDashboard = () => {
         console.error("Invalid price:", order.price);
         return acc;
       }
-    }, 0);
+    }, 0) || 0;
 
-  // Formatting the totalSum
-  const formattedTotal =
-    totalSum >= 1000
-      ? totalSum % 1000 === 0
-        ? `${totalSum / 1000}k`
-        : `${(totalSum / 1000).toFixed(1)}k`
-      : totalSum;
+  const formatCurrency = (amount) => {
+    const num = parseFloat(amount) || 0;
+    return `₹${num.toLocaleString("en-IN", {
+      maximumFractionDigits: 2,
+    })}`;
+  };
 
   const getSmilebalance = async () => {
     try {
@@ -340,6 +381,55 @@ const AdminDashboard = () => {
           </div>
           <PointOfSaleIcon className="icon" />
         </div>
+
+        <div className="dash-card" onClick={() => navigate("/admin-orders")}>
+          <div className="count">
+            <h2 className="m-0">
+              {loading ? (
+                <div class="spinner-border spinner-border-sm" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              ) : (
+                <b>{formatCurrency(todaySum)}</b>
+              )}
+            </h2>
+            <span className="text-muted">Today's Sale</span>
+          </div>
+          <MonetizationOnIcon className="icon" />
+        </div>
+
+        <div className="dash-card" onClick={() => navigate("/admin-orders")}>
+          <div className="count">
+            <h2 className="m-0">
+              {loading ? (
+                <div class="spinner-border spinner-border-sm" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              ) : (
+                <b>{formatCurrency(thisMonthSum)}</b>
+              )}
+            </h2>
+            <span className="text-muted">This Month's Sale</span>
+          </div>
+          <MonetizationOnIcon className="icon" />
+        </div>
+
+        <div className="dash-card" onClick={() => navigate("/admin-payments")}>
+          <div className="count">
+            <h2 className="m-0">
+              {loading ? (
+                <div class="spinner-border spinner-border-sm" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              ) : (
+                <b>{formatCurrency(totalSum)}</b>
+              )}
+            </h2>
+            <span className="text-muted">Total Sales</span>
+          </div>
+          <MonetizationOnIcon className="icon" />
+        </div>
+
         <div className="dash-card" onClick={() => navigate("/admin-orders")}>
           <div className="count">
             <h1 className="m-0">
@@ -371,6 +461,7 @@ const AdminDashboard = () => {
           </div>
           <PointOfSaleIcon className="icon" />
         </div>
+
         <div className="dash-card" onClick={() => navigate("/admin-orders")}>
           <div className="count">
             <h3 className="m-0">
@@ -386,6 +477,7 @@ const AdminDashboard = () => {
           </div>
           <PointOfSaleIcon className="icon" />
         </div>
+
         <div className="dash-card" onClick={() => navigate("/admin-products")}>
           <div className="count">
             <h1 className="m-0">
@@ -401,7 +493,8 @@ const AdminDashboard = () => {
           </div>
           <StayCurrentPortraitIcon className="icon" />
         </div>
-        <div className="dash-card" onClick={() => navigate("/admin-payments")}>
+
+        <div className="dash-card" onClick={() => navigate("/admin-queries")}>
           <div className="count">
             <h1 className="m-0">
               {loading ? (
@@ -409,29 +502,12 @@ const AdminDashboard = () => {
                   <span class="visually-hidden">Loading...</span>
                 </div>
               ) : (
-                <b>{formattedTotal || 0}</b>
+                <b>
+                  {queries?.filter((item) => {
+                    return item.status === "pending";
+                  }).length || 0}
+                </b>
               )}
-            </h1>
-            <span className="text-muted">Total Sales</span>
-          </div>
-          <MonetizationOnIcon className="icon" />
-        </div>
-        <div className="dash-card" onClick={() => navigate("/admin-queries")}>
-          <div className="count">
-            <h1 className="m-0">
-              <h1 className="m-0">
-                {loading ? (
-                  <div class="spinner-border spinner-border-sm" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                  </div>
-                ) : (
-                  <b>
-                    {queries?.filter((item) => {
-                      return item.status === "pending";
-                    }).length || 0}
-                  </b>
-                )}
-              </h1>
             </h1>
             <span className="title">Queries</span>
           </div>

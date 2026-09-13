@@ -48,68 +48,125 @@ router.post("/get-user-payments", authMiddleware, async (req, res) => {
 // get role
 router.post("/get-role", generalRateLimiter, async (req, res) => {
   try {
-    const { userid, zoneid, apiName } = req.body;
+    const { userid, zoneid, region, apiName } = req.body;
+
+    if (!userid) {
+      return res.status(200).send({
+        success: false,
+        message: "User ID is required",
+      });
+    }
+
+    const cleanUserId = String(userid).trim();
+    const cleanZoneId = zoneid ? String(zoneid).trim() : "";
+
     const uid = process.env.UID;
     const email = process.env.EMAIL;
     const product = "mobilelegends";
     const time = Math.floor(Date.now() / 1000);
     const mKey = process.env.KEY;
 
-    const region = "philliphines";
-    const productid = "212";
+    // Smile.one endpoints to try (Brazil & Global endpoints with productid 13 are reliable and bypass Cloudflare blocks)
+    const endpointsToTry = [
+      { url: "https://www.smile.one/br/smilecoin/api/getrole", productid: "13" },
+      { url: "https://www.smile.one/smilecoin/api/getrole", productid: "13" },
+      { url: "https://www.smile.one/br/smilecoin/api/getrole", productid: "212" },
+    ];
 
-    // GENERATING SIGN
-    const signArr = {
-      uid,
-      email,
-      product,
-      time,
-      userid,
-      zoneid,
-      productid,
-    };
-    const sortedSignArr = Object.fromEntries(Object.entries(signArr).sort());
-    const str =
-      Object.keys(sortedSignArr)
-        .map((key) => `${key}=${sortedSignArr[key]}`)
-        .join("&") +
-      "&" +
-      mKey;
-    const sign = md5(md5(str));
-
-    const formData = querystring.stringify({
-      email,
-      uid,
-      userid,
-      zoneid,
-      product,
-      productid,
-      time,
-      sign,
-    });
-    let apiUrl =
-      region === "brazil"
-        ? "https://www.smile.one/br/smilecoin/api/getrole"
-        : "https://www.smile.one/ph/smilecoin/api/getrole";
-    let role;
-    role = await axios.post(apiUrl, formData, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
-    if (role.data.status === 200) {
-      return res.status(200).send({
-        success: true,
-        username: role.data.username,
-        zone: role.data.zone,
-        message: role.data.message,
+    // If region explicitly provided as philliphines, add PH endpoint as well
+    if (region === "philliphines" || region === "ph") {
+      endpointsToTry.push({
+        url: "https://www.smile.one/ph/smilecoin/api/getrole",
+        productid: "212",
       });
-    } else {
-      return res
-        .status(201)
-        .send({ success: false, message: role.data.message });
     }
+
+    for (const ep of endpointsToTry) {
+      try {
+        const signArr = {
+          uid,
+          email,
+          product,
+          time,
+          userid: cleanUserId,
+          zoneid: cleanZoneId,
+          productid: ep.productid,
+        };
+
+        const sortedSignArr = Object.fromEntries(
+          Object.entries(signArr).sort()
+        );
+        const str =
+          Object.keys(sortedSignArr)
+            .map((key) => `${key}=${sortedSignArr[key]}`)
+            .join("&") +
+          "&" +
+          mKey;
+        const sign = md5(md5(str));
+
+        const formData = querystring.stringify({
+          email,
+          uid,
+          userid: cleanUserId,
+          zoneid: cleanZoneId,
+          product,
+          productid: ep.productid,
+          time,
+          sign,
+        });
+
+        const response = await axios.post(ep.url, formData, {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            Accept: "application/json, text/plain, */*",
+          },
+          timeout: 8000,
+        });
+
+        const data = response.data;
+        if (data && typeof data === "object") {
+          if (data.status === 200) {
+            let username = data.username || "";
+            try {
+              username = decodeURIComponent(username);
+            } catch (_) {}
+
+            return res.status(200).send({
+              success: true,
+              username: username,
+              zone: data.zone,
+              message: data.message || "Username verified",
+            });
+          } else if (
+            data.status === 20004 ||
+            data.status === 20002 ||
+            (data.message && data.message.toLowerCase().includes("não existe"))
+          ) {
+            return res.status(200).send({
+              success: false,
+              message: "Invalid User ID or Zone ID. Please check and try again.",
+            });
+          } else if (data.status !== 207) {
+            // If it's not a "Product does not exist" config error, return provider message
+            return res.status(200).send({
+              success: false,
+              message: data.message || "Could not verify username",
+            });
+          }
+        }
+      } catch (endpointErr) {
+        console.warn(`[GET_ROLE] Endpoint ${ep.url} failed:`, endpointErr.message);
+      }
+    }
+
+    return res.status(200).send({
+      success: false,
+      message: "Unable to verify username at this moment. Please check your IDs or try again.",
+    });
   } catch (error) {
+    console.error("Get role controller error:", error);
     return res.status(500).send({ success: false, message: error.message });
   }
 });
