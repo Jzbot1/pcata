@@ -48,7 +48,7 @@ router.post("/create-order", authMiddleware, async (req, res) => {
 
     const priceExists = pp.cost.some(
       (item) =>
-        item.amount === amount &&
+        String(item.amount).trim() === String(amount).trim() &&
         (Number(item.price) === Number(txn_amount) || (Number(item.resPrice) === Number(txn_amount)))
     );
     if (!priceExists) {
@@ -348,31 +348,31 @@ router.post("/wallet", authMiddleware, async (req, res) => {
   try {
     const { api, userid, zoneid, orderId, customer_email, customer_mobile, amount, price, pname, couponId } = req.body;
 
-    if (!orderId || !userid || !zoneid || !customer_email || !customer_mobile || !amount || !price || !pname) {
-      return res.status(201).json({ message: "Invalid details" });
+    if (!orderId || !userid || !customer_email || !customer_mobile || !amount || !price || !pname) {
+      return res.status(201).json({ success: false, message: "Invalid details. Missing required fields." });
     }
 
     //CHECK IF ORDER AVAILABLE
     const order = await orderModel.findOne({ orderId });
     if (order) {
-      return res.status(201).json({ message: "Please refresh you page" });
+      return res.status(201).json({ success: false, message: "Please refresh your page" });
     } 
 
     // Validate Product
     const checkProduct = await productModel.findOne({ name: pname });
     if (!checkProduct) {
-      return res.status(201).json({ message: "Product not found" });
+      return res.status(201).json({ success: false, message: "Product not found" });
     }
 
     //CROSS CHECK PACKAGE PRICE AND GAME ID
     const priceExists = checkProduct.cost.some(
       (item) =>
-        item.amount === amount &&
+        String(item.amount).trim() === String(amount).trim() &&
         (Number(item.price) === Number(price) || (Number(item.resPrice) === Number(price)))
     );
 
     if (!priceExists) {
-      return res.status(201).json({ message: "Amount does not match." });
+      return res.status(201).json({ success: false, message: "Amount does not match." });
     }
 
     // Validate User and Wallet Balance
@@ -382,11 +382,7 @@ router.post("/wallet", authMiddleware, async (req, res) => {
       return res.status(201).json({ success: false, message: "Invalid email" });
     }
 
-    finalPrice = Number(finalPrice);
-
-    if (finalPrice <= 0) {
-      return res.status(400).json({ success: false, message: "Invalid price, cannot proceed with zero or negative amount." });
-    }
+    let finalPrice = Number(price);
 
     // Apply Coupon Discount (if available)
     let discountApplied = 0;
@@ -403,6 +399,10 @@ router.post("/wallet", authMiddleware, async (req, res) => {
       }
     }
 
+    if (finalPrice <= 0) {
+      return res.status(400).json({ success: false, message: "Invalid price, cannot proceed with zero or negative amount." });
+    }
+
     // Atomic Deduct Balance & Save Wallet History
     const updatedUser = await userModel.findOneAndUpdate(
       { email: customer_email, balance: { $gte: finalPrice } },
@@ -411,7 +411,7 @@ router.post("/wallet", authMiddleware, async (req, res) => {
     );
 
     if (!updatedUser) {
-      return res.status(400).json({ success: false, message: "Insufficient balance" });
+      return res.status(400).json({ success: false, message: "Insufficient wallet balance" });
     }
 
     const newBalance = updatedUser.balance;

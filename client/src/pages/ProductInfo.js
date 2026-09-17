@@ -215,31 +215,25 @@ const ProductInfo = () => {
   //* ================================= ORDER SYSTEM ==========================================
 
   function checkPlaceOrder(e) {
-    if (product?.playerCheckBtn === "yes") {
+    if (!amount || !selectedPrice) {
+      return message.error("Please select a package");
+    }
+    if (!mode) {
+      return message.error("Please select a payment method");
+    }
+
+    if (product?.playerCheckBtn === "yes" && product?.api === "yes") {
       if (playerCheck === null) {
-        return message.error("Check your username");
+        return message.error("Please check your username first");
       }
     }
-    if (product?.api === "no") {
-      if (userId === "") {
-        return message.error("Some Fields are missing");
-      }
-    } else if (product.api === "yes" && product?.apiName === "moogold") {
-      if (product?.gameName === "15145") {
-        if (userId === "") {
-          return message.error("Enter User ID");
-        }
-        if (zoneId === "") {
-          return message.error("Enter Zone ID");
-        }
-      }
-    } else {
-      if (userId === "") {
-        return message.error("Enter User ID");
-      }
-      if (zoneId === "") {
-        return message.error("Enter Zone ID");
-      }
+
+    if (!userId || !userId.trim()) {
+      return message.error("Please enter User ID");
+    }
+
+    if (product?.fields === "2" && (!zoneId || !zoneId.trim())) {
+      return message.error("Please enter Zone ID");
     }
 
     if (product?.api === "yes") {
@@ -597,17 +591,19 @@ const ProductInfo = () => {
 
   // manual
   const handleUpiOrder = async (e) => {
-    e.preventDefault();
+    e?.preventDefault?.();
     setLoading(true);
     try {
+      const cleanUserId = (userId || "").trim();
+      const cleanZoneId = (zoneId || "none").trim();
       const paymentObject = {
         order_id: orderId,
         txn_amount: selectedPrice,
-        txn_note: userId.trim() + "@" + zoneId.trim() + "@" + amount,
+        txn_note: `${cleanUserId}@${cleanZoneId}@${amount}`,
         product_name: product?.name,
-        customer_name: user?.fname,
-        customer_mobile: user?.mobile,
-        customer_email: user?.email,
+        customer_name: user?.fname || "Customer",
+        customer_mobile: user?.mobile || "",
+        customer_email: user?.email || "",
         ...(singleCouponeData ? { couponId: singleCouponeData._id } : {}),
       };
 
@@ -618,32 +614,36 @@ const ProductInfo = () => {
       });
       if (response.data.success && response.data.data.payment_url) {
         window.location.href = response.data.data.payment_url;
-        setLoading(false);
       } else {
-        message.error(response.data.message);
-        setLoading(false);
+        message.error(response.data.message || "Failed to initiate payment");
       }
     } catch (error) {
-      setLoading(false);
       console.log(error);
+      message.error(error.response?.data?.message || "Failed to create order");
+    } finally {
+      setLoading(false);
     }
   };
+
   const handleWalletOrder = async (e) => {
-    if (parseInt(balance) < parseInt(selectedPrice)) {
-      return message.error("Balance is less for this order");
+    e?.preventDefault?.();
+    const cleanPrice = Number(selectedPrice);
+    if (Number(balance || 0) < cleanPrice) {
+      return message.error("Insufficient wallet balance for this order");
     }
-    e.preventDefault();
     try {
+      const cleanUserId = (userId || "").trim();
+      const cleanZoneId = (zoneId || "none").trim();
       const orderObject = {
         api: "no",
         orderId: orderId,
-        userid: userId.trim(),
-        zoneid: zoneId.trim(),
-        customer_email: user && user?.email,
-        customer_mobile: user && user?.mobile,
+        userid: cleanUserId,
+        zoneid: cleanZoneId,
+        customer_email: user?.email || "",
+        customer_mobile: user?.mobile || "",
         pname: product?.name,
         amount: amount,
-        price: selectedPrice,
+        price: cleanPrice,
         ...(singleCouponeData ? { couponId: singleCouponeData._id } : {}),
       };
 
@@ -654,18 +654,18 @@ const ProductInfo = () => {
         },
       });
       if (res.data.success) {
-        setLoading(false);
-        message.success(res.data.message);
+        message.success(res.data.message || "Order Placed Successfully");
         setOrderSuccess(true);
       } else {
-        message.error(res.data.message);
-        setLoading(false);
+        message.error(res.data.message || "Failed to place order");
         localStorage.setItem("orderProcess", "no");
       }
     } catch (error) {
       console.log(error);
-      setLoading(false);
+      message.error(error.response?.data?.message || "Error placing wallet order");
       localStorage.setItem("orderProcess", "no");
+    } finally {
+      setLoading(false);
     }
   };
 
