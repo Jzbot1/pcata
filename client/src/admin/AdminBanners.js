@@ -194,14 +194,33 @@ const AdminBanners = () => {
                       <td>
                         <img
                           width="80px"
-                          src={`https://zelanstore.com/${item?.image}`}
+                          src={
+                            item?.image?.startsWith("http")
+                              ? item.image
+                              : `https://zelanstore.com/${String(item?.image || "").replace(/\\/g, "/")}`
+                          }
                           alt=""
                           loading="lazy"
+                          style={{ borderRadius: "8px", objectFit: "cover", height: "45px" }}
                         />
                       </td>
                       <td className="no-wrap">{item?.heading}</td>
                       <td className="no-wrap">{item?.title}</td>
-                      <td>{item?.link}</td>
+                      <td>
+                        <a
+                          href={
+                            item?.link?.startsWith("http")
+                              ? item.link
+                              : item?.link?.startsWith("/")
+                              ? item.link
+                              : `https://${item?.link}`
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {item?.link}
+                        </a>
+                      </td>
                       <td className="d-flex gap-2">
                         <button
                           onClick={() => handleEdit(item)}

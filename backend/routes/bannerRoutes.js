@@ -35,11 +35,11 @@ router.post(
     try {
       const { link, seq, heading, title } = req.body;
       const banner = new bannerModel({
-        image: req.file.path,
-        link: link,
+        image: req.file ? req.file.path.replace(/\\/g, "/") : "",
+        link: link ? link.trim() : "",
         seq: seq,
-        heading: heading,
-        title: title
+        heading: heading ? heading.trim() : "",
+        title: title ? title.trim() : "",
       });
       await banner.save();
       return res
@@ -98,11 +98,16 @@ router.post(
   async (req, res) => {
     try {
       const { id, link, seq, heading, title } = req.body;
-      const updateData = { link, seq, heading, title };
+      const updateData = {
+        link: link ? link.trim() : "",
+        seq,
+        heading: heading ? heading.trim() : "",
+        title: title ? title.trim() : "",
+      };
 
       // If a new image is uploaded, include it in the update
       if (req.file) {
-        updateData.image = req.file.path;
+        updateData.image = req.file.path.replace(/\\/g, "/");
       }
 
       const updatedBanner = await bannerModel.findByIdAndUpdate(
