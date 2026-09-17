@@ -13,6 +13,7 @@ import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import ViewCarouselIcon from "@mui/icons-material/ViewCarousel";
 import DiscountIcon from "@mui/icons-material/Discount";
 import SettingsIcon from "@mui/icons-material/Settings";
+import TelegramIcon from "@mui/icons-material/Telegram";
 import { Link, useNavigate } from "react-router-dom";
 
 const SUPER_ADMIN_EMAIL = "zomuansangajacob523@gmail.com";
@@ -60,15 +61,26 @@ const AdminSidemenu = ({ menu, setMenu }) => {
           Payment
         </li>
         {isSuperAdmin && (
-          <li
-            onClick={() => {
-              setMenu(!menu);
-              navigate("/admin-payment-config");
-            }}
-          >
-            <SettingsIcon className="me-2" />
-            Payment Gateway
-          </li>
+          <>
+            <li
+              onClick={() => {
+                setMenu(!menu);
+                navigate("/admin-payment-config");
+              }}
+            >
+              <SettingsIcon className="me-2" />
+              Payment Gateway
+            </li>
+            <li
+              onClick={() => {
+                setMenu(!menu);
+                navigate("/admin-telegram-config");
+              }}
+            >
+              <TelegramIcon className="me-2" />
+              Telegram Config
+            </li>
+          </>
         )}
         <li
           onClick={() => {

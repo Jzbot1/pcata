@@ -12,6 +12,7 @@ import CollectionsIcon from "@mui/icons-material/Collections";
 import ViewCarouselIcon from "@mui/icons-material/ViewCarousel";
 import DiscountIcon from "@mui/icons-material/Discount";
 import SettingsIcon from "@mui/icons-material/Settings";
+import TelegramIcon from "@mui/icons-material/Telegram";
 import { Link } from "react-router-dom";
 import "./AdminSidebar.css";
 
@@ -64,12 +65,20 @@ const AdminSidebar = () => {
           </Link>
         </li>
         {isSuperAdmin && (
-          <li>
-            <Link to="/admin-payment-config">
-              <SettingsIcon className="me-2" />
-              Payment Gateway
-            </Link>
-          </li>
+          <>
+            <li>
+              <Link to="/admin-payment-config">
+                <SettingsIcon className="me-2" />
+                Payment Gateway
+              </Link>
+            </li>
+            <li>
+              <Link to="/admin-telegram-config">
+                <TelegramIcon className="me-2" />
+                Telegram Config
+              </Link>
+            </li>
+          </>
         )}
         <li>
           <Link to="/admin-wallet-history">

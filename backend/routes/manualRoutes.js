@@ -13,6 +13,7 @@ const walletHistoryModel = require("../models/walletHistoryModel");
 const paymentConfigModel = require("../models/paymentConfigModel");
 const paymentGatewayService = require("../services/paymentGatewayService");
 const pendingPaymentModel = require("../models/pendingPaymentModel");
+const telegramService = require("../services/telegramService");
 
 // Create an Express Router
 const router = express.Router();
@@ -319,6 +320,13 @@ router.all("/check-status", async (req, res) => {
         console.error("Admin mail error:", err);
       }
 
+      //! SEND TELEGRAM ALERT FOR MANUAL ORDER
+      try {
+        telegramService.sendManualOrderAlert(orderData);
+      } catch (tgErr) {
+        console.error("[MANUAL_ORDER] Telegram alert error:", tgErr);
+      }
+
       return res.redirect(`https://zelanstore.com/orders?payment=success&orderId=${effectiveOrderId}`);
     } else {
       if (pendingRecord) {
@@ -487,6 +495,13 @@ router.post("/wallet", authMiddleware, async (req, res) => {
     const msgg =
       `Hello Admin! You have received a new ${pname} order. Kindly login to see your order.`;
     await sendMail(process.env.CLIENT_EMAIL, sub, "", msgg);
+
+    //! SEND TELEGRAM ALERT FOR MANUAL ORDER
+    try {
+      telegramService.sendManualOrderAlert(orderData);
+    } catch (tgErr) {
+      console.error("[MANUAL_ORDER_WALLET] Telegram alert error:", tgErr);
+    }
 
     return res.status(200).json({ success: true, message: "Order Placed Successfully" });
 

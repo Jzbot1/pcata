@@ -1,0 +1,190 @@
+.telegram-config-container {
+  padding: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.telegram-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  padding: 28px;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+}
+
+.telegram-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(36, 161, 222, 0.12);
+  color: #24a1de;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.telegram-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 6px;
+}
+
+.telegram-subtitle {
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.form-group-custom {
+  margin-bottom: 20px;
+}
+
+.form-group-custom label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #334155;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.input-wrapper-custom {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-custom {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #1e293b;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.input-custom:focus {
+  border-color: #24a1de;
+  box-shadow: 0 0 0 3px rgba(36, 161, 222, 0.15);
+}
+
+.toggle-btn-eye {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-btn-eye:hover {
+  color: #475569;
+}
+
+.switch-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.btn-actions-group {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.btn-tg-primary {
+  background: #24a1de;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(36, 161, 222, 0.25);
+}
+
+.btn-tg-primary:hover {
+  background: #1c88bd;
+  transform: translateY(-1px);
+}
+
+.btn-tg-test {
+  background: #ffffff;
+  color: #24a1de;
+  border: 1.5px solid #24a1de;
+  border-radius: 10px;
+  padding: 12px 22px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-tg-test:hover {
+  background: rgba(36, 161, 222, 0.08);
+}
+
+.instructions-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.instruction-step {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.step-number {
+  background: #24a1de;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.step-text {
+  font-size: 13.5px;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.step-text code {
+  background: #e2e8f0;
+  color: #0f172a;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12.5px;
+}

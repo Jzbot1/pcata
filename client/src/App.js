@@ -29,6 +29,7 @@ import ViewOrder from "./user/ViewOrder";
 import AdminViewOrder from "./admin/AdminViewOrder";
 import AdminAddCoupon from "./admin/AdminAddCoupon.js";
 import AdminPaymentConfig from "./admin/AdminPaymentConfig.js";
+import AdminTelegramConfig from "./admin/AdminTelegramConfig.js";
 import AdminQueries from "./admin/AdminQueries";
 import Wallet from "./user/Wallet";
 import Query from "./user/Query";
@@ -315,6 +316,15 @@ function App() {
           element={
             <SuperAdminRoute>
               <AdminPaymentConfig />
+            </SuperAdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin-telegram-config"
+          element={
+            <SuperAdminRoute>
+              <AdminTelegramConfig />
             </SuperAdminRoute>
           }
         />
