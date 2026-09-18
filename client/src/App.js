@@ -108,6 +108,9 @@ function App() {
       dispatch(setUser(u));
       setUserState(u);
     }, setBalance);
+
+    const mInterval = setInterval(getMaintenanceConfig, 15000);
+    return () => clearInterval(mInterval);
   }, []);
 
   const isSuperAdmin =
