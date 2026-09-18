@@ -14,6 +14,7 @@ import ViewCarouselIcon from "@mui/icons-material/ViewCarousel";
 import DiscountIcon from "@mui/icons-material/Discount";
 import SettingsIcon from "@mui/icons-material/Settings";
 import TelegramIcon from "@mui/icons-material/Telegram";
+import BuildCircleIcon from "@mui/icons-material/BuildCircle";
 import { Link, useNavigate } from "react-router-dom";
 
 const SUPER_ADMIN_EMAIL = "zomuansangajacob523@gmail.com";
@@ -41,6 +42,15 @@ const AdminSidemenu = ({ menu, setMenu }) => {
         >
           <HomeIcon className="me-2" />
           Dashboard
+        </li>
+        <li
+          onClick={() => {
+            setMenu(!menu);
+            navigate("/admin-maintenance");
+          }}
+        >
+          <BuildCircleIcon className="me-2" />
+          Maintenance Mode
         </li>
         <li
           onClick={() => {

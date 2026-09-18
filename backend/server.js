@@ -183,6 +183,7 @@ app.use("/api/wallet/", require("./routes/walletHistoryRoutes"));
 app.use("/api/categories/", require("./routes/categoryRoutes"));
 app.use("/api/leaderboard/", require("./routes/leaderboardRoutes"));
 app.use("/api/telegram/", require("./routes/telegramRoutes"));
+app.use("/api/maintenance/", require("./routes/maintenanceRoutes"));
 
 // PORT
 const port = process.env.PORT || 8080;

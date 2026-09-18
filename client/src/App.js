@@ -48,6 +48,8 @@ import axios from "axios";
 import { message } from "antd";
 import AdminAddReward from "./admin/AdminAddReward.js";
 import AdminRewards from "./admin/AdminRewards.js";
+import AdminMaintenance from "./admin/AdminMaintenance.js";
+import MaintenancePage from "./pages/MaintenancePage.js";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 function App() {
@@ -56,6 +58,8 @@ function App() {
   const [googleClientId, setGoogleClientId] = useState(
     process.env.REACT_APP_GOOGLE_CLIENT_ID || ""
   );
+  const [maintenance, setMaintenance] = useState(null);
+  const [userState, setUserState] = useState(null);
 
   async function getAuthConfig() {
     try {
@@ -65,6 +69,17 @@ function App() {
       }
     } catch (err) {
       console.log("Error loading auth config:", err);
+    }
+  }
+
+  async function getMaintenanceConfig() {
+    try {
+      const res = await axios.get("/api/maintenance/status");
+      if (res.data.success && res.data.data) {
+        setMaintenance(res.data.data);
+      }
+    } catch (err) {
+      console.log("Error loading maintenance status:", err);
     }
   }
 
@@ -87,15 +102,32 @@ function App() {
 
   useEffect(() => {
     getAuthConfig();
+    getMaintenanceConfig();
     getBanners();
-    getUserData(dispatch, setUser, setBalance);
+    getUserData(dispatch, (u) => {
+      dispatch(setUser(u));
+      setUserState(u);
+    }, setBalance);
   }, []);
+
+  const isSuperAdmin =
+    userState?.email &&
+    userState.email.toLowerCase() === "zomuansangajacob523@gmail.com".toLowerCase();
+  const isAdmin = Boolean(userState?.isAdmin || isSuperAdmin);
+
+  const renderWithMaintenanceGuard = (component) => {
+    if (maintenance && maintenance.isMaintenance && !isAdmin) {
+      return <MaintenancePage config={maintenance} />;
+    }
+    return component;
+  };
+
   return (
     <GoogleOAuthProvider clientId={googleClientId || "dummy-client-id"}>
       <BrowserRouter>
         <Routes>
         {/* pages */}
-        <Route path="/:token?" element={<Home />} />
+        <Route path="/:token?" element={renderWithMaintenanceGuard(<Home />)} />
         <Route
           path="/register"
           element={
@@ -109,10 +141,10 @@ function App() {
           }
         />
         <Route path="/forgot-password" element={<ForgotPass />} />
-        <Route path="/games" element={<GamePage />} />
-        <Route path="/search" element={<Search />} />
+        <Route path="/games" element={renderWithMaintenanceGuard(<GamePage />)} />
+        <Route path="/search" element={renderWithMaintenanceGuard(<Search />)} />
         <Route path="/support" element={<Contact />} />
-        <Route path="/product/:name?" element={<ProductInfo/>} />
+        <Route path="/product/:name?" element={renderWithMaintenanceGuard(<ProductInfo/>)} />
         <Route
           path="/orders"
           element={
@@ -272,6 +304,15 @@ function App() {
           element={
             <AdminRoute>
               <AdminPayments />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin-maintenance"
+          element={
+            <AdminRoute>
+              <AdminMaintenance />
             </AdminRoute>
           }
         />
