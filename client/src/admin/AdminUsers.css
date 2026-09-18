@@ -1,63 +1,230 @@
+/* Modern Botanical Glassmorphism Admin Tables & Management Views */
+
+.admin-users-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .page-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  color: #fff;
-}
-.page-title h3{
-  color: #fff;
-}
-.page-title button {
-  background-color: #fff;
-  border: transparent;
-  outline: transparent;
-  color: #fffcfc;
-  padding: 5px 10px;
-}
-.table-container {
-  background-color: #fff;
-  padding: 20px 10px;
-}
-.tools {
-  display: flex;
-  justify-content: start;
-  gap: 15px;
-}
-.table-container input {
-  border: transparent;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
-  color: #333;
-}
-.table-container input:focus {
-  outline: transparent;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
-}
-.user-table {
-  overflow-x: scroll !important;
-}
-.user-table img {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  border-radius: 100px;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 18px;
+  padding: 16px 24px;
+  box-shadow: 0 6px 20px rgba(27, 56, 32, 0.04);
 }
 
-.pagination {
-  color: #333;
-  padding: 5px;
+.page-title h3 {
+  color: var(--p, #1b3820) !important;
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  margin: 0;
 }
+
+.page-title button {
+  background: linear-gradient(180deg, #3d7545 0%, #26542c 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 0 #143519, 0 6px 14px rgba(20, 53, 25, 0.28) !important;
+  padding: 8px 20px !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.page-title button:hover {
+  background: linear-gradient(180deg, #46844f 0%, #2c6033 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 #143519, 0 8px 18px rgba(20, 53, 25, 0.35) !important;
+}
+
+.page-title button:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #143519, 0 2px 4px rgba(20, 53, 25, 0.2) !important;
+}
+
+/* TABLE CONTAINER */
+.table-container {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 8px 25px rgba(27, 56, 32, 0.05);
+  color: var(--text-dark, #1b3820);
+}
+
+.tools {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tools > div {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1.5px solid rgba(45, 85, 51, 0.15);
+  border-radius: 30px;
+  padding: 6px 16px;
+  box-shadow: 0 2px 8px rgba(27, 56, 32, 0.04);
+  transition: all 0.2s ease;
+  min-width: 280px;
+}
+
+.tools > div:focus-within {
+  border-color: var(--t, #3b7441);
+  box-shadow: 0 0 0 3px rgba(59, 116, 65, 0.15);
+}
+
+.table-container input {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  color: var(--text-dark, #1b3820) !important;
+  font-size: 0.9rem;
+  font-weight: 600;
+  width: 100%;
+  padding: 4px 8px;
+  margin: 0 !important;
+}
+
+.table-container input::placeholder {
+  color: var(--text-muted, #537557);
+  font-weight: 500;
+}
+
+/* USER & PRODUCT TABLE */
+.user-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  margin-top: 8px;
+}
+
+.user-table thead th {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted, #537557);
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+}
+
+.user-table tbody tr {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(27, 56, 32, 0.03);
+  transition: all 0.18s ease;
+}
+
+.user-table tbody tr:hover {
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(27, 56, 32, 0.08);
+  transform: translateY(-1px);
+}
+
+.user-table tbody td {
+  padding: 14px;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-dark, #1b3820);
+  vertical-align: middle;
+}
+
+.user-table tbody td:first-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+.user-table tbody td:last-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.user-table img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* ACTION BUTTONS */
+.user-table svg {
+  cursor: pointer;
+  padding: 6px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(45, 85, 51, 0.08);
+  color: var(--p, #1b3820);
+  transition: all 0.18s ease;
+}
+
+.user-table svg:hover {
+  background: var(--bg-button);
+  color: #fff !important;
+  transform: scale(1.1);
+}
+
+.user-table svg.text-danger:hover {
+  background: #dc3545 !important;
+  color: #fff !important;
+}
+
+/* PAGINATION */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
 .pagination span {
-  background-color: #eee;
-  padding: 5px 10px;
+  background: #ffffff;
+  border: 1px solid rgba(45, 85, 51, 0.15);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--p, #1b3820);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.pagination span:hover,
+.pagination span.active {
+  background: var(--bg-button);
+  color: #fff;
+  border-color: #143519;
 }
 
 @media screen and (max-width: 992px) {
   .table-container {
-    overflow-x: scroll;
+    padding: 16px;
+    overflow-x: auto;
   }
-  .user-table img {
-    width: 100%;
-    border-radius: 100px;
+  .user-table {
+    min-width: 600px;
   }
 }

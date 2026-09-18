@@ -1,17 +1,21 @@
+/* Modern Botanical Glassmorphism Telegram Config */
+
 .telegram-config-container {
-  padding: 24px;
+  padding: 10px;
   max-width: 900px;
   margin: 0 auto;
 }
 
 .telegram-card {
-  background: #ffffff;
-  border-radius: 16px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  padding: 28px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(27, 56, 32, 0.05);
+  padding: 32px;
   margin-bottom: 24px;
-  transition: all 0.3s ease;
+  color: var(--text-dark, #1b3820);
 }
 
 .telegram-header-badge {
@@ -19,24 +23,25 @@
   align-items: center;
   gap: 8px;
   background: rgba(36, 161, 222, 0.12);
-  color: #24a1de;
+  color: #0284c7;
   padding: 6px 14px;
   border-radius: 20px;
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: 700;
+  font-size: 13px;
   margin-bottom: 12px;
+  border: 1px solid rgba(36, 161, 222, 0.25);
 }
 
 .telegram-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #1e293b;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--p, #1b3820);
   margin-bottom: 6px;
 }
 
 .telegram-subtitle {
-  color: #64748b;
-  font-size: 14px;
+  color: var(--text-muted, #537557);
+  font-size: 0.9rem;
   margin-bottom: 24px;
 }
 
@@ -45,9 +50,9 @@
 }
 
 .form-group-custom label {
-  font-weight: 600;
-  font-size: 14px;
-  color: #334155;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--p, #1b3820);
   margin-bottom: 8px;
   display: block;
 }
@@ -61,43 +66,42 @@
 .input-custom {
   width: 100%;
   padding: 12px 16px;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
+  border: 1.5px solid rgba(45, 85, 51, 0.18);
+  border-radius: 12px;
   font-size: 14px;
-  color: #1e293b;
+  color: var(--text-dark, #1b3820);
+  background: #ffffff;
   transition: all 0.2s ease;
   outline: none;
+  box-shadow: 0 2px 6px rgba(27, 56, 32, 0.03);
 }
 
 .input-custom:focus {
-  border-color: #24a1de;
-  box-shadow: 0 0 0 3px rgba(36, 161, 222, 0.15);
+  border-color: var(--t, #3b7441);
+  box-shadow: 0 0 0 3px rgba(59, 116, 65, 0.15);
 }
 
 .toggle-btn-eye {
   position: absolute;
   right: 12px;
-  background: none;
-  border: none;
-  color: #94a3b8;
+  background: rgba(45, 85, 51, 0.08);
+  border: 1px solid rgba(45, 85, 51, 0.15);
+  border-radius: 8px;
+  color: var(--p, #1b3820);
   cursor: pointer;
-  padding: 4px;
+  padding: 4px 8px;
   display: flex;
   align-items: center;
-}
-
-.toggle-btn-eye:hover {
-  color: #475569;
 }
 
 .switch-wrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 18px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(45, 85, 51, 0.15);
+  border-radius: 14px;
   margin-bottom: 24px;
 }
 
@@ -109,48 +113,51 @@
 }
 
 .btn-tg-primary {
-  background: #24a1de;
-  color: #ffffff;
-  border: none;
+  background: linear-gradient(180deg, #3d7545 0%, #26542c 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 4px 0 #143519, 0 6px 14px rgba(20, 53, 25, 0.28) !important;
   border-radius: 10px;
   padding: 12px 24px;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 14px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(36, 161, 222, 0.25);
+  transition: all 0.15s ease;
 }
 
 .btn-tg-primary:hover {
-  background: #1c88bd;
-  transform: translateY(-1px);
+  background: linear-gradient(180deg, #46844f 0%, #2c6033 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 #143519, 0 8px 18px rgba(20, 53, 25, 0.35) !important;
 }
 
 .btn-tg-test {
   background: #ffffff;
-  color: #24a1de;
-  border: 1.5px solid #24a1de;
+  color: var(--p, #1b3820);
+  border: 1.5px solid rgba(45, 85, 51, 0.3);
   border-radius: 10px;
   padding: 12px 22px;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 14px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .btn-tg-test:hover {
-  background: rgba(36, 161, 222, 0.08);
+  background: rgba(45, 85, 51, 0.08);
+  border-color: var(--p, #1b3820);
 }
 
 .instructions-card {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(45, 85, 51, 0.15);
+  border-left: 4px solid var(--t, #3b7441);
   border-radius: 14px;
   padding: 20px;
 }
@@ -162,7 +169,7 @@
 }
 
 .step-number {
-  background: #24a1de;
+  background: var(--bg-button);
   color: white;
   width: 28px;
   height: 28px;
@@ -173,17 +180,18 @@
   font-weight: 700;
   font-size: 13px;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(20, 53, 25, 0.2);
 }
 
 .step-text {
   font-size: 13.5px;
-  color: #475569;
+  color: var(--text-muted, #537557);
   line-height: 1.5;
 }
 
 .step-text code {
-  background: #e2e8f0;
-  color: #0f172a;
+  background: rgba(45, 85, 51, 0.08);
+  color: var(--p, #1b3820);
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 12.5px;

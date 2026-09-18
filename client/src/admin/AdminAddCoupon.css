@@ -1,47 +1,93 @@
+/* Modern Botanical Glassmorphism Admin Add Coupon */
+
 .admin-coupon-container {
-  background-color: #fff;
-  color: #333;
-  padding: 20px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(27, 56, 32, 0.05);
+  color: var(--text-dark, #1b3820);
+  padding: 30px;
 }
+
 .admin-offer-btn-tabs {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 10px;
 }
+
 .admin-offer-btn-tabs button {
-  padding: 10px 20px;
-  background-color: #eee;
-  outline: transparent;
-  border: transparent;
+  padding: 10px 22px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1.5px solid rgba(45, 85, 51, 0.15);
+  border-radius: 12px;
+  color: var(--p, #1b3820);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
+
 .admin-offer-btn-tabs button.active {
-  background-color: #ebef29;
+  background: linear-gradient(180deg, #3d7545 0%, #26542c 100%) !important;
+  color: #ffffff !important;
+  border-color: #143519 !important;
+  box-shadow: 0 4px 0 #143519, 0 6px 14px rgba(20, 53, 25, 0.28) !important;
 }
+
 .add-coupon-container,
 .shipping-charge {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 20px;
 }
+
+.add-coupon-container input,
+.shipping-charge input {
+  padding: 10px 16px;
+  border: 1.5px solid rgba(45, 85, 51, 0.18);
+  border-radius: 12px;
+  color: var(--text-dark, #1b3820);
+  background: #ffffff;
+  outline: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(27, 56, 32, 0.03);
+}
+
+.add-coupon-container button,
+.shipping-charge button {
+  background: linear-gradient(180deg, #3d7545 0%, #26542c 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 0 #143519, 0 6px 14px rgba(20, 53, 25, 0.28) !important;
+  padding: 10px 22px !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
 .coupons-container {
   margin-top: 20px;
   display: flex;
   width: 100%;
   flex-wrap: wrap;
+  gap: 14px;
 }
-.coupons-container .icon {
-  cursor: pointer;
-  scale: 1;
-  transition: 0.3s all ease;
-  &:hover {
-    color: red;
-    scale: 1.1;
-  }
-}
+
 .no-coupon {
-  height: 200px;
+  height: 180px;
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 2px dashed rgba(45, 85, 51, 0.2);
+  border-radius: 16px;
   width: 100%;
+  color: var(--text-muted, #537557);
+  font-weight: 600;
 }

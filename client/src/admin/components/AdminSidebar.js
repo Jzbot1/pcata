@@ -1,154 +1,203 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { Link, useLocation } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import GroupIcon from "@mui/icons-material/Group";
 import PaymentIcon from "@mui/icons-material/Payment";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import HelpIcon from "@mui/icons-material/Help";
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import CollectionsIcon from "@mui/icons-material/Collections";
-import ViewCarouselIcon from "@mui/icons-material/ViewCarousel";
 import DiscountIcon from "@mui/icons-material/Discount";
 import SettingsIcon from "@mui/icons-material/Settings";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import BuildCircleIcon from "@mui/icons-material/BuildCircle";
-import { Link } from "react-router-dom";
+import CategoryIcon from "@mui/icons-material/Category";
+import ViewCarouselIcon from "@mui/icons-material/ViewCarousel";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import "./AdminSidebar.css";
 
 const SUPER_ADMIN_EMAIL = "zomuansangajacob523@gmail.com";
 
 const AdminSidebar = () => {
+  const location = useLocation();
   const { user } = useSelector((state) => state.user);
   const isSuperAdmin =
     user?.email && user.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
 
+  const isActive = (path) => location.pathname === path;
+
   return (
-    <div className="admin-sidebar-container">
-      <span>
-        <small>MAIN</small>
-      </span>
-      <ul>
-        <li>
-          <Link to="/admin-dashboard">
-            <HomeIcon className="me-2" />
+    <nav className="admin-sidebar-container">
+      <span className="admin-sidebar-section-title">Overview</span>
+      <ul className="admin-sidebar-menu">
+        <li className="admin-sidebar-item">
+          <Link
+            to="/admin-dashboard"
+            className={`admin-sidebar-link ${isActive("/admin-dashboard") ? "active" : ""}`}
+          >
+            <HomeIcon />
             Dashboard
           </Link>
         </li>
-        <li>
-          <Link to="/admin-maintenance">
-            <BuildCircleIcon className="me-2 text-warning" />
+        <li className="admin-sidebar-item">
+          <Link
+            to="/admin-maintenance"
+            className={`admin-sidebar-link ${isActive("/admin-maintenance") ? "active" : ""}`}
+          >
+            <BuildCircleIcon />
             Maintenance Mode
           </Link>
         </li>
       </ul>
-      <span>
-        <small>LISTS</small>
-      </span>
-      <ul>
-        <li>
-          <Link to="/admin-orders">
-            <ReceiptIcon className="me-2" />
+
+      <span className="admin-sidebar-section-title">Catalog & Store</span>
+      <ul className="admin-sidebar-menu">
+        <li className="admin-sidebar-item">
+          <Link
+            to="/admin-orders"
+            className={`admin-sidebar-link ${isActive("/admin-orders") ? "active" : ""}`}
+          >
+            <ReceiptIcon />
             Orders
           </Link>
         </li>
-        <li>
-          <Link to="/admin-products">
-            <InventoryIcon className="me-2" />
+        <li className="admin-sidebar-item">
+          <Link
+            to="/admin-products"
+            className={`admin-sidebar-link ${isActive("/admin-products") ? "active" : ""}`}
+          >
+            <InventoryIcon />
             Products
           </Link>
         </li>
-        <li>
-          <Link to="/admin-users">
-            <GroupIcon className="me-2" />
-            Customers
+        <li className="admin-sidebar-item">
+          <Link
+            to="/admin-product-category"
+            className={`admin-sidebar-link ${isActive("/admin-product-category") ? "active" : ""}`}
+          >
+            <CategoryIcon />
+            Categories
           </Link>
         </li>
-        <li>
-          <Link to="/admin-payments">
-            <PaymentIcon className="me-2" />
-            Payments
-          </Link>
-        </li>
-        {isSuperAdmin && (
-          <>
-            <li>
-              <Link to="/admin-payment-config">
-                <SettingsIcon className="me-2" />
-                Payment Gateway
-              </Link>
-            </li>
-            <li>
-              <Link to="/admin-telegram-config">
-                <TelegramIcon className="me-2" />
-                Telegram Config
-              </Link>
-            </li>
-          </>
-        )}
-        <li>
-          <Link to="/admin-wallet-history">
-            <PaymentIcon className="me-2" />
-            Wallet History
-          </Link>
-        </li>
-        <li>
-          <Link to="/admin-queries">
-            <HelpIcon className="me-2" />
-            Queries
-          </Link>
-        </li>
-        <li>
-          <Link to="/admin-gallery">
-            <CollectionsIcon className="me-2" />
-            Gallery
-          </Link>
-        </li>
-        <li>
-          <Link to="/admin-banners">
-            <CollectionsIcon className="me-2" />
-            Banners
-          </Link>
-        </li>
-        <li>
-          <Link to="/admin-add-reward">
-            <EmojiEventsIcon className="me-2" />
-            Add Rewards
-          </Link>
-        </li>
-        <li>
-          <Link to="/admin-rewards">
-            <EmojiEventsIcon className="me-2" />
-            Winner List
-          </Link>
-        </li>
-        <li>
-          <Link to="/admin-product-category">
-            <CollectionsIcon className="me-2" />
-            Add Category
-          </Link>
-        </li>
-        {/* <li>
-          <Link to="/admin-banners">
-            <ViewCarouselIcon className="me-2" />
-            Banners
-          </Link>
-        </li> */}
-        {/* <li>
-          <Link to="/admin-notification">
-            <NotificationsActiveIcon className="me-2" />
-            Notification
-          </Link>
-        </li> */}
-        <li>
-          <Link to="/admin-add-coupon">
-            <DiscountIcon className="me-2" />
+        <li className="admin-sidebar-item">
+          <Link
+            to="/admin-add-coupon"
+            className={`admin-sidebar-link ${isActive("/admin-add-coupon") ? "active" : ""}`}
+          >
+            <DiscountIcon />
             Coupons
           </Link>
         </li>
       </ul>
-    </div>
+
+      <span className="admin-sidebar-section-title">Finance & Users</span>
+      <ul className="admin-sidebar-menu">
+        <li className="admin-sidebar-item">
+          <Link
+            to="/admin-users"
+            className={`admin-sidebar-link ${isActive("/admin-users") ? "active" : ""}`}
+          >
+            <GroupIcon />
+            Customers
+          </Link>
+        </li>
+        <li className="admin-sidebar-item">
+          <Link
+            to="/admin-payments"
+            className={`admin-sidebar-link ${isActive("/admin-payments") ? "active" : ""}`}
+          >
+            <PaymentIcon />
+            Payments
+          </Link>
+        </li>
+        <li className="admin-sidebar-item">
+          <Link
+            to="/admin-wallet-history"
+            className={`admin-sidebar-link ${isActive("/admin-wallet-history") ? "active" : ""}`}
+          >
+            <AccountBalanceWalletIcon />
+            Wallet History
+          </Link>
+        </li>
+        <li className="admin-sidebar-item">
+          <Link
+            to="/admin-queries"
+            className={`admin-sidebar-link ${isActive("/admin-queries") ? "active" : ""}`}
+          >
+            <HelpIcon />
+            Queries
+          </Link>
+        </li>
+      </ul>
+
+      <span className="admin-sidebar-section-title">Marketing & Content</span>
+      <ul className="admin-sidebar-menu">
+        <li className="admin-sidebar-item">
+          <Link
+            to="/admin-banners"
+            className={`admin-sidebar-link ${isActive("/admin-banners") ? "active" : ""}`}
+          >
+            <ViewCarouselIcon />
+            Banners
+          </Link>
+        </li>
+        <li className="admin-sidebar-item">
+          <Link
+            to="/admin-gallery"
+            className={`admin-sidebar-link ${isActive("/admin-gallery") ? "active" : ""}`}
+          >
+            <CollectionsIcon />
+            Gallery
+          </Link>
+        </li>
+        <li className="admin-sidebar-item">
+          <Link
+            to="/admin-add-reward"
+            className={`admin-sidebar-link ${isActive("/admin-add-reward") ? "active" : ""}`}
+          >
+            <EmojiEventsIcon />
+            Add Reward
+          </Link>
+        </li>
+        <li className="admin-sidebar-item">
+          <Link
+            to="/admin-rewards"
+            className={`admin-sidebar-link ${isActive("/admin-rewards") ? "active" : ""}`}
+          >
+            <EmojiEventsIcon />
+            Winner List
+          </Link>
+        </li>
+      </ul>
+
+      {isSuperAdmin && (
+        <>
+          <span className="admin-sidebar-section-title">System & Gateway</span>
+          <ul className="admin-sidebar-menu">
+            <li className="admin-sidebar-item">
+              <Link
+                to="/admin-payment-config"
+                className={`admin-sidebar-link ${isActive("/admin-payment-config") ? "active" : ""}`}
+              >
+                <SettingsIcon />
+                Payment Gateways
+              </Link>
+            </li>
+            <li className="admin-sidebar-item">
+              <Link
+                to="/admin-telegram-config"
+                className={`admin-sidebar-link ${isActive("/admin-telegram-config") ? "active" : ""}`}
+              >
+                <TelegramIcon />
+                Telegram Bots
+              </Link>
+            </li>
+          </ul>
+        </>
+      )}
+    </nav>
   );
 };
 

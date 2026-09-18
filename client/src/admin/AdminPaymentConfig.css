@@ -1,10 +1,15 @@
+/* Modern Botanical Glassmorphism Payment Config */
+
 .payment-config-wrapper {
   width: 100%;
-  background-color: #fff;
-  color: #111;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  color: var(--text-dark, #1b3820);
+  padding: 32px;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(27, 56, 32, 0.05);
   margin-bottom: 30px;
 }
 
@@ -12,7 +17,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 1px solid rgba(45, 85, 51, 0.12);
   padding-bottom: 18px;
   margin-bottom: 25px;
   flex-wrap: wrap;
@@ -20,9 +25,9 @@
 }
 
 .payment-config-header h2 {
-  font-size: 22px;
-  font-weight: 700;
-  color: #111827;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--p, #1b3820);
   margin: 0;
   display: flex;
   align-items: center;
@@ -30,8 +35,8 @@
 }
 
 .payment-config-header p {
-  color: #6b7280;
-  font-size: 13px;
+  color: var(--text-muted, #537557);
+  font-size: 0.9rem;
   margin: 4px 0 0 0;
 }
 
@@ -42,13 +47,13 @@
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .gateway-status-pill.active {
-  background-color: #ecfdf5;
-  color: #059669;
-  border: 1px solid #a7f3d0;
+  background-color: rgba(45, 85, 51, 0.12);
+  color: var(--p, #1b3820);
+  border: 1px solid rgba(45, 85, 51, 0.25);
 }
 
 .gateway-status-pill.inactive {
@@ -86,9 +91,9 @@
 }
 
 .config-field-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1f2937;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--p, #1b3820);
   margin-bottom: 8px;
   display: flex;
   align-items: center;
@@ -108,19 +113,20 @@
   font-size: 15px;
   font-family: monospace, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
   font-weight: 500;
-  color: #111827 !important;
+  color: var(--text-dark, #1b3820) !important;
   background-color: #ffffff !important;
-  border: 1.5px solid #d1d5db;
-  border-radius: 8px;
+  border: 1.5px solid rgba(45, 85, 51, 0.18);
+  border-radius: 12px;
   transition: all 0.2s ease;
   letter-spacing: 0.3px;
+  box-shadow: 0 2px 6px rgba(27, 56, 32, 0.03);
 }
 
 .config-input-field:focus {
-  border-color: #2563eb;
+  border-color: var(--t, #3b7441);
   background-color: #ffffff !important;
-  color: #000000 !important;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+  color: var(--text-dark, #1b3820) !important;
+  box-shadow: 0 0 0 3px rgba(59, 116, 65, 0.15);
   outline: none;
 }
 
@@ -133,35 +139,35 @@
 .toggle-visibility-button {
   position: absolute;
   right: 12px;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  color: #4b5563;
+  background: rgba(45, 85, 51, 0.08);
+  border: 1px solid rgba(45, 85, 51, 0.15);
+  border-radius: 8px;
+  color: var(--p, #1b3820);
   cursor: pointer;
-  padding: 5px 8px;
+  padding: 5px 10px;
   display: flex;
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   transition: all 0.2s;
 }
 
 .toggle-visibility-button:hover {
-  background: #e5e7eb;
-  color: #111827;
+  background: var(--bg-button);
+  color: #ffffff;
 }
 
 .field-help-text {
   font-size: 12.5px;
-  color: #6b7280;
+  color: var(--text-muted, #537557);
   margin-top: 6px;
   line-height: 1.4;
 }
 
 .field-help-text code {
-  background-color: #f3f4f6;
-  color: #1e40af;
+  background-color: rgba(45, 85, 51, 0.08);
+  color: var(--p, #1b3820);
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 12px;
@@ -173,34 +179,35 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(45, 85, 51, 0.15);
+  border-radius: 14px;
   margin-top: 5px;
 }
 
 .config-switch-info h5 {
   font-size: 14px;
-  font-weight: 600;
-  color: #1f2937;
+  font-weight: 700;
+  color: var(--p, #1b3820);
   margin: 0 0 2px 0;
 }
 
 .config-switch-info span {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-muted, #537557);
 }
 
 .save-config-action-btn {
-  background-color: #ebef29;
-  color: #111111;
-  border: 1.5px solid #d4d812;
-  padding: 12px 28px;
+  background: linear-gradient(180deg, #3d7545 0%, #26542c 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 4px 0 #143519, 0 6px 14px rgba(20, 53, 25, 0.28) !important;
+  padding: 12px 32px;
   font-size: 15px;
   font-weight: 700;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -209,34 +216,38 @@
 }
 
 .save-config-action-btn:hover:not(:disabled) {
-  background-color: #dbe010;
+  background: linear-gradient(180deg, #46844f 0%, #2c6033 100%) !important;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(235, 239, 41, 0.4);
+  box-shadow: 0 4px 0 #143519, 0 8px 18px rgba(20, 53, 25, 0.35) !important;
+}
+
+.save-config-action-btn:active:not(:disabled) {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #143519, 0 2px 4px rgba(20, 53, 25, 0.2) !important;
 }
 
 .save-config-action-btn:disabled {
-  background-color: #e5e7eb;
-  border-color: #d1d5db;
-  color: #9ca3af;
+  background: #e5e7eb !important;
+  color: #9ca3af !important;
+  box-shadow: none !important;
   cursor: not-allowed;
   transform: none;
-  box-shadow: none;
 }
 
 /* Info Box */
 .gateway-guide-box {
   margin-top: 25px;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-left: 4px solid #3b82f6;
-  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(45, 85, 51, 0.15);
+  border-left: 4px solid var(--t, #3b7441);
+  border-radius: 12px;
   padding: 20px;
 }
 
 .gateway-guide-box h4 {
   font-size: 15px;
-  font-weight: 600;
-  color: #0f172a;
+  font-weight: 700;
+  color: var(--p, #1b3820);
   margin: 0 0 10px 0;
   display: flex;
   align-items: center;
@@ -246,7 +257,7 @@
 .gateway-guide-box ul {
   padding-left: 20px;
   margin: 0;
-  color: #475569;
+  color: var(--text-muted, #537557);
   font-size: 13px;
   line-height: 1.6;
 }

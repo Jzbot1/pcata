@@ -1,12 +1,30 @@
+/* Modern Botanical Glassmorphism Admin Banners & Notifications */
+
 .noti-container {
-    padding: 10px 10px;
-    background-color: #fff;
-    button {
-      padding: 8px 10px;
-      outline: transparent;
-      border: transparent;
-      background-color: #70b452;
-      color: #fff;
-    }
-  }
-  
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(27, 56, 32, 0.05);
+  color: var(--text-dark, #1b3820);
+}
+
+.noti-container button {
+  padding: 10px 24px;
+  background: linear-gradient(180deg, #3d7545 0%, #26542c 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 0 #143519, 0 6px 14px rgba(20, 53, 25, 0.28) !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.noti-container button:hover {
+  background: linear-gradient(180deg, #46844f 0%, #2c6033 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 #143519, 0 8px 18px rgba(20, 53, 25, 0.35) !important;
+}

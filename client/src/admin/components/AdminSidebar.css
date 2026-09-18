@@ -1,9 +1,90 @@
-.admin-sidebar-container li {
-  margin: 20px 0;
+/* Modern Botanical Glassmorphism Admin Sidebar */
+
+.admin-sidebar-container {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(27, 56, 32, 0.06);
+  padding: 20px 16px;
+  position: sticky;
+  top: 88px;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
 }
-.admin-sidebar-container a {
-  color: #fff;
+
+.admin-sidebar-container::-webkit-scrollbar {
+  width: 5px;
 }
-.admin-sidebar-container span {
-  font-weight: 100;
+
+.admin-sidebar-container::-webkit-scrollbar-thumb {
+  background: rgba(45, 85, 51, 0.2);
+  border-radius: 10px;
+}
+
+.admin-sidebar-section-title {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted, #537557);
+  margin: 16px 0 8px 12px;
+}
+
+.admin-sidebar-section-title:first-child {
+  margin-top: 4px;
+}
+
+.admin-sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.admin-sidebar-item {
+  margin: 0;
+}
+
+.admin-sidebar-link {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-dark, #1b3820);
+  text-decoration: none;
+  transition: all 0.18s ease;
+  border: 1px solid transparent;
+}
+
+.admin-sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--t, #3b7441);
+  transform: translateX(3px);
+  border-color: rgba(45, 85, 51, 0.12);
+  box-shadow: 0 2px 8px rgba(27, 56, 32, 0.05);
+}
+
+.admin-sidebar-link.active {
+  background: linear-gradient(180deg, #3d7545 0%, #26542c 100%) !important;
+  color: #ffffff !important;
+  border-color: #143519 !important;
+  box-shadow: 0 4px 0 #143519, 0 6px 14px rgba(20, 53, 25, 0.25) !important;
+}
+
+.admin-sidebar-link.active svg {
+  color: #ffffff !important;
+}
+
+.admin-sidebar-link svg {
+  font-size: 20px;
+  margin-right: 10px;
+  color: var(--text-muted, #537557);
+  transition: color 0.18s ease;
 }

@@ -309,334 +309,308 @@ const AdminDashboard = () => {
 
   return (
     <AdminLayout>
-      <div className="page-title">
-        <h3 className="m-0">Dashboard</h3>
-        {/* <div className={`toggle-icon`} onClick={handleMaintenance}>
-          <div className={`circle ${toggle && "active"}`}>
-            {loading && (
-              <div class="spinner-grow spinner-grow-sm" role="status">
-                <span class="sr-only"></span>
-              </div>
-            )}
+      <div className="admin-dashboard-page">
+        <div className="dashboard-header-banner">
+          <div>
+            <h2 className="dashboard-header-title">Welcome to Store Overview 👋</h2>
+            <p className="dashboard-header-subtitle">
+              Real-time sales, live orders, wallet balances, and system status
+            </p>
           </div>
-        </div> */}
-      </div>
-      <hr />
-      {/* <div className="chart-container">
-        <div className="chartOne">
-          <h4>Total Orders</h4>
-          <div className="hr-line"></div>
-          <Bar
-            data={{
-              labels: monthlyOrdersData.labels,
-              datasets: [
-                {
-                  label: "Total Orders",
-                  data: monthlyOrdersData.data,
-                  backgroundColor: "#ffca00",
-                  borderWidth: 0,
-                },
-              ],
-            }}
-            options={{
-              scales: {
-                y: {
-                  beginAtZero: true,
-                },
-              },
-            }}
-          />
-        </div>
-        <div className="chartTwo">
-          <h4>Total Sales</h4>
-          <div className="hr-line"></div>
-          <Line
-            data={{
-              labels: monthlySalesData.labels,
-              datasets: [
-                {
-                  label: "Total Sales",
-                  data: monthlySalesData.data,
-                  fill: false,
-                  borderColor: "rgba(75,192,192,1)",
-                  borderWidth: 2,
-                  pointRadius: 3,
-                  pointBackgroundColor: "rgba(75,192,192,1)",
-                  pointBorderColor: "rgba(75,192,192,1)",
-                  pointHoverRadius: 5,
-                  pointHoverBackgroundColor: "rgba(75,192,192,1)",
-                  pointHoverBorderColor: "rgba(75,192,192,1)",
-                },
-              ],
-            }}
-            options={{
-              scales: {
-                y: {
-                  beginAtZero: true,
-                },
-              },
-            }}
-          />
-        </div>
-      </div> */}
-      <div className="admin-dashboard-container p-0">
-        <div className="dash-card" onClick={() => navigate("/admin-orders")}>
-          <div className="count">
-            <h1 className="m-0">
-              {loading ? (
-                <div class="spinner-border spinner-border-sm" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-              ) : (
-                <b>{orders?.length || 0}</b>
-              )}
-            </h1>
-            <span className="text-muted">Total Orders</span>
+          <div className="dashboard-header-actions">
+            <button
+              className="action-3d-btn px-3 py-2"
+              onClick={() => navigate("/admin-products")}
+            >
+              + Manage Products
+            </button>
+            <button
+              className="action-3d-btn px-3 py-2"
+              style={{ background: "linear-gradient(180deg, #2d5533 0%, #1b3820 100%)" }}
+              onClick={() => navigate("/admin-orders")}
+            >
+              View Orders
+            </button>
           </div>
-          <PointOfSaleIcon className="icon" />
         </div>
 
-        <div className="dash-card" onClick={() => navigate("/admin-orders")}>
-          <div className="count">
-            <h2 className="m-0">
-              {loading ? (
-                <div class="spinner-border spinner-border-sm" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-              ) : (
-                <b>{formatCurrency(todaySum)}</b>
-              )}
-            </h2>
-            <span className="text-muted">Today's Sale</span>
+        <div className="admin-dashboard-container">
+          <div className="dash-card" onClick={() => navigate("/admin-orders")}>
+            <div className="count">
+              <span className="dash-label">Total Orders</span>
+              <h1>
+                {loading ? (
+                  <div className="spinner-border spinner-border-sm text-success" role="status" />
+                ) : (
+                  orders?.length || 0
+                )}
+              </h1>
+            </div>
+            <div className="dash-icon-box green">
+              <PointOfSaleIcon />
+            </div>
           </div>
-          <MonetizationOnIcon className="icon" />
+
+          <div className="dash-card" onClick={() => navigate("/admin-orders")}>
+            <div className="count">
+              <span className="dash-label">Today's Sale</span>
+              <h2>
+                {loading ? (
+                  <div className="spinner-border spinner-border-sm text-success" role="status" />
+                ) : (
+                  formatCurrency(todaySum)
+                )}
+              </h2>
+            </div>
+            <div className="dash-icon-box gold">
+              <MonetizationOnIcon />
+            </div>
+          </div>
+
+          <div className="dash-card" onClick={() => navigate("/admin-orders")}>
+            <div className="count">
+              <span className="dash-label">This Month</span>
+              <h2>
+                {loading ? (
+                  <div className="spinner-border spinner-border-sm text-success" role="status" />
+                ) : (
+                  formatCurrency(thisMonthSum)
+                )}
+              </h2>
+            </div>
+            <div className="dash-icon-box teal">
+              <MonetizationOnIcon />
+            </div>
+          </div>
+
+          <div className="dash-card" onClick={() => navigate("/admin-payments")}>
+            <div className="count">
+              <span className="dash-label">Total Sales</span>
+              <h2>
+                {loading ? (
+                  <div className="spinner-border spinner-border-sm text-success" role="status" />
+                ) : (
+                  formatCurrency(totalSum)
+                )}
+              </h2>
+            </div>
+            <div className="dash-icon-box amber">
+              <MonetizationOnIcon />
+            </div>
+          </div>
+
+          <div className="dash-card" onClick={() => navigate("/admin-orders")}>
+            <div className="count">
+              <span className="dash-label">Smile Coin</span>
+              <h1>
+                {loading ? (
+                  <div className="spinner-border spinner-border-sm text-success" role="status" />
+                ) : (
+                  smileBalance || "0.00"
+                )}
+              </h1>
+            </div>
+            <div className="dash-icon-box purple">
+              <PointOfSaleIcon />
+            </div>
+          </div>
+
+          <div className="dash-card" onClick={() => navigate("/admin-orders")}>
+            <div className="count">
+              <span className="dash-label">Yok Cash</span>
+              <h3>
+                {loading ? (
+                  <div className="spinner-border spinner-border-sm text-success" role="status" />
+                ) : (
+                  yokcashBalance || "0.00"
+                )}
+              </h3>
+            </div>
+            <div className="dash-icon-box blue">
+              <PointOfSaleIcon />
+            </div>
+          </div>
+
+          <div className="dash-card" onClick={() => navigate("/admin-orders")}>
+            <div className="count">
+              <span className="dash-label">MooGold Bal</span>
+              <h3>
+                {loading ? (
+                  <div className="spinner-border spinner-border-sm text-success" role="status" />
+                ) : (
+                  moogoldBalance ? `${moogoldBalance} ${moogoldCurrency}` : "0.00"
+                )}
+              </h3>
+            </div>
+            <div className="dash-icon-box green">
+              <PointOfSaleIcon />
+            </div>
+          </div>
+
+          <div className="dash-card" onClick={() => navigate("/admin-products")}>
+            <div className="count">
+              <span className="dash-label">Total Products</span>
+              <h1>
+                {loading ? (
+                  <div className="spinner-border spinner-border-sm text-success" role="status" />
+                ) : (
+                  products?.length || 0
+                )}
+              </h1>
+            </div>
+            <div className="dash-icon-box teal">
+              <StayCurrentPortraitIcon />
+            </div>
+          </div>
+
+          <div className="dash-card" onClick={() => navigate("/admin-queries")}>
+            <div className="count">
+              <span className="dash-label">Pending Queries</span>
+              <h1>
+                {loading ? (
+                  <div className="spinner-border spinner-border-sm text-success" role="status" />
+                ) : (
+                  queries?.filter((item) => item.status === "pending").length || 0
+                )}
+              </h1>
+            </div>
+            <div className="dash-icon-box blue">
+              <HelpIcon />
+            </div>
+          </div>
+
+          <div className="dash-card" onClick={() => navigate("/admin-maintenance")}>
+            <div className="count">
+              <span className="dash-label">Maintenance Mode</span>
+              <h2 className="mt-1">
+                <span className={`badge ${isMaintenance ? "bg-danger" : "bg-success"}`} style={{ fontSize: "0.88rem", padding: "6px 12px", borderRadius: "20px" }}>
+                  {isMaintenance ? "ACTIVE ⚠️" : "OFF (LIVE) 🟢"}
+                </span>
+              </h2>
+            </div>
+            <div className={`dash-icon-box ${isMaintenance ? "red" : "green"}`}>
+              <BuildCircleIcon />
+            </div>
+          </div>
         </div>
 
-        <div className="dash-card" onClick={() => navigate("/admin-orders")}>
-          <div className="count">
-            <h2 className="m-0">
-              {loading ? (
-                <div class="spinner-border spinner-border-sm" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-              ) : (
-                <b>{formatCurrency(thisMonthSum)}</b>
-              )}
-            </h2>
-            <span className="text-muted">This Month's Sale</span>
-          </div>
-          <MonetizationOnIcon className="icon" />
-        </div>
-
-        <div className="dash-card" onClick={() => navigate("/admin-payments")}>
-          <div className="count">
-            <h2 className="m-0">
-              {loading ? (
-                <div class="spinner-border spinner-border-sm" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-              ) : (
-                <b>{formatCurrency(totalSum)}</b>
-              )}
-            </h2>
-            <span className="text-muted">Total Sales</span>
-          </div>
-          <MonetizationOnIcon className="icon" />
-        </div>
-
-        <div className="dash-card" onClick={() => navigate("/admin-orders")}>
-          <div className="count">
-            <h1 className="m-0">
-              {loading ? (
-                <div class="spinner-border spinner-border-sm" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-              ) : (
-                <b>{smileBalance || 0}</b>
-              )}
-            </h1>
-            <span className="text-muted">Smile Coin</span>
-          </div>
-          <PointOfSaleIcon className="icon" />
-        </div>
-
-        <div className="dash-card" onClick={() => navigate("/admin-orders")}>
-          <div className="count">
-            <h3 className="m-0">
-              {loading ? (
-                <div class="spinner-border spinner-border-sm" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-              ) : (
-                <b>{yokcashBalance || 0}</b>
-              )}
-            </h3>
-            <span className="text-muted">Yok Bal</span>
-          </div>
-          <PointOfSaleIcon className="icon" />
-        </div>
-
-        <div className="dash-card" onClick={() => navigate("/admin-orders")}>
-          <div className="count">
-            <h3 className="m-0">
-              {loading ? (
-                <div class="spinner-border spinner-border-sm" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-              ) : (
-                <b>{moogoldBalance ? `${moogoldBalance} ${moogoldCurrency}` : "0.00"}</b>
-              )}
-            </h3>
-            <span className="text-muted">MooGold Bal</span>
-          </div>
-          <PointOfSaleIcon className="icon" />
-        </div>
-
-        <div className="dash-card" onClick={() => navigate("/admin-products")}>
-          <div className="count">
-            <h1 className="m-0">
-              {loading ? (
-                <div class="spinner-border spinner-border-sm" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-              ) : (
-                <b>{products?.length || 0}</b>
-              )}
-            </h1>
-            <span className="text-muted">Total Products</span>
-          </div>
-          <StayCurrentPortraitIcon className="icon" />
-        </div>
-
-        <div className="dash-card" onClick={() => navigate("/admin-queries")}>
-          <div className="count">
-            <h1 className="m-0">
-              {loading ? (
-                <div class="spinner-border spinner-border-sm" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-              ) : (
-                <b>
-                  {queries?.filter((item) => {
-                    return item.status === "pending";
-                  }).length || 0}
-                </b>
-              )}
-            </h1>
-            <span className="title">Queries</span>
-          </div>
-          <HelpIcon className="icon" />
-        </div>
-
-        <div className="dash-card" onClick={() => navigate("/admin-maintenance")}>
-          <div className="count">
-            <h2 className="m-0">
-              <span className={`badge ${isMaintenance ? "bg-danger" : "bg-success"}`} style={{ fontSize: "1rem" }}>
-                {isMaintenance ? "ACTIVE ⚠️" : "OFF (LIVE) 🟢"}
-              </span>
-            </h2>
-            <span className="text-muted">Maintenance Mode</span>
-          </div>
-          <BuildCircleIcon className="icon text-warning" />
-        </div>
-      </div>
-      <div className="admin-recent-things">
-        <div className="recent-orders">
-          <h5>Recent Orders</h5>
-          <hr />
-          <table className="table ">
-            <thead>
-              <tr>
-                <th>Order Id</th>
-                <th>Email</th>
-                <th>Total</th>
-                <th>Date</th>
-                <th>View</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders
-                ?.map((item, index) => {
-                  return (
+        <div className="admin-recent-things">
+          <div className="recent-orders">
+            <div className="recent-card-header">
+              <h4>Recent Orders</h4>
+              <button className="recent-view-all-btn" onClick={() => navigate("/admin-orders")}>
+                View All →
+              </button>
+            </div>
+            <div className="table-responsive">
+              <table className="admin-dashboard-table">
+                <thead>
+                  <tr>
+                    <th>Order Id</th>
+                    <th>Customer</th>
+                    <th>Total</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders?.slice(0, 5).map((item, index) => (
                     <tr key={index}>
                       <td>
-                        <small>{item?.orderId}</small>
+                        <span className="order-id-chip">{item?.orderId}</span>
                       </td>
                       <td>
-                        <small>{item?.customer_email}</small>
+                        <span style={{ fontSize: "0.85rem" }}>{item?.customer_email}</span>
                       </td>
                       <td>
-                        <small>{item?.price}</small>
+                        <span className="order-price-chip">₹{item?.price}</span>
                       </td>
                       <td>
-                        <small>
-                          {new Date(item?.createdAt).toLocaleString("default", {
+                        <small className="text-muted">
+                          {new Date(item?.createdAt).toLocaleDateString("en-IN", {
                             day: "numeric",
-                            month: "long",
+                            month: "short",
                             year: "numeric",
                           })}
                         </small>
                       </td>
                       <td>
-                        <RemoveRedEyeIcon
-                          onClick={() =>
-                            navigate(`/admin-view-order/${item?.orderId}`)
-                          }
-                          className="text-success icon"
-                        />
+                        <button
+                          className="action-icon-btn"
+                          title="View Order"
+                          onClick={() => navigate(`/admin-view-order/${item?.orderId}`)}
+                        >
+                          <RemoveRedEyeIcon style={{ fontSize: "18px" }} />
+                        </button>
                       </td>
                     </tr>
-                  );
-                })
-                .slice(0, 5)}
-            </tbody>
-          </table>
-        </div>
-        <div className="recent-queries">
-          <h5>Recent Queries</h5>
-          <hr />
-          <table className="table ">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Mobile</th>
-                <th>Message</th>
-              </tr>
-            </thead>
-            <tbody>
-              {queries &&
-                queries
-                  ?.filter((item) => {
-                    return item.status === "pending";
-                  })
-                  .map((item, index) => {
-                    return (
+                  ))}
+                  {(!orders || orders.length === 0) && (
+                    <tr>
+                      <td colSpan="5" className="text-center py-4 text-muted">
+                        No recent orders found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="recent-queries">
+            <div className="recent-card-header">
+              <h4>Recent Queries</h4>
+              <button className="recent-view-all-btn" onClick={() => navigate("/admin-queries")}>
+                View All →
+              </button>
+            </div>
+            <div className="table-responsive">
+              <table className="admin-dashboard-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {queries
+                    ?.filter((item) => item.status === "pending")
+                    .slice(0, 5)
+                    .map((item, index) => (
                       <tr key={index}>
                         <td>
-                          <small>{item?.name}</small>
+                          <b>{item?.name}</b>
                         </td>
                         <td>
-                          <small>{item?.email}</small>
+                          <span style={{ fontSize: "0.85rem" }}>{item?.email}</span>
                         </td>
                         <td>
                           <small>{item?.mobile}</small>
                         </td>
                         <td>
                           <button
-                            className="register-btn p-1"
+                            className="action-icon-btn"
+                            title="View Query"
                             onClick={() => navigate("/admin-queries")}
                           >
-                            View
+                            <RemoveRedEyeIcon style={{ fontSize: "18px" }} />
                           </button>
-                          {/* <small>{(item?.msg).slice(0, 10)}..</small> */}
                         </td>
                       </tr>
-                    );
-                  })
-                  .slice(0, 5)}
-            </tbody>
-          </table>
+                    ))}
+                  {(!queries || queries.filter((item) => item.status === "pending").length === 0) && (
+                    <tr>
+                      <td colSpan="4" className="text-center py-4 text-muted">
+                        No pending queries.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </AdminLayout>

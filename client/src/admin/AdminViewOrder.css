@@ -1,68 +1,102 @@
+/* Modern Botanical Glassmorphism Admin View Order */
+
 .admin-view-order-container {
-  padding: 50px 20px;
-  margin-top: 50px;
-  background-color: #fff;
-  color: #333;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(27, 56, 32, 0.05);
+  margin-top: 20px;
+  color: var(--text-dark, #1b3820);
   display: flex;
   flex-wrap: wrap;
   width: 100%;
-  gap: 2%;
+  gap: 24px;
 }
+
 .admin-order-details-container {
-  width: 68%;
+  width: 66%;
   display: flex;
   flex-direction: column;
-  background-color: #eee;
-  padding: 20px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(45, 85, 51, 0.12);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 14px rgba(27, 56, 32, 0.03);
 }
+
 .admin-order-details {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
 }
+
 .admin-order-general-details,
 .admin-order-shipping-details {
   width: 50%;
-  padding: 20px 0;
+  padding: 14px 0;
 }
+
 .admin-order-item-details {
-  margin: 30px 0;
+  margin: 20px 0;
 }
+
 .admin-order-item {
-  background-color: #fff;
+  background: #ffffff;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
-  padding: 20px;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(45, 85, 51, 0.1);
+  box-shadow: 0 2px 8px rgba(27, 56, 32, 0.03);
 }
+
 .item-cost,
 .item-qty {
   width: 25%;
   display: flex;
   justify-content: center;
   align-items: center;
+  font-weight: 700;
 }
+
 .item-img {
   width: 25%;
 }
+
 .item-img img {
-  width: 50%;
+  width: 54px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
+
 .item-brand {
   width: 25%;
+  font-weight: 700;
 }
+
 .admin-order-actions {
-  padding: 20px;
-  background-color: #eee;
-  width: 30%;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(45, 85, 51, 0.12);
+  border-radius: 16px;
+  width: 31%;
+  box-shadow: 0 4px 14px rgba(27, 56, 32, 0.03);
 }
-.order-table .icon {
-  cursor: pointer;
-}
+
 .admin-order-total {
-  background-color: #fff;
-  padding: 20px;
-  gap: 0;
+  background: #ffffff;
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(45, 85, 51, 0.1);
+  font-weight: 800;
+  color: var(--p, #1b3820);
 }
 
 @media screen and (max-width: 992px) {

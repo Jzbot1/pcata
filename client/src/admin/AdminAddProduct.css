@@ -1,27 +1,55 @@
+/* Modern Botanical Glassmorphism Admin Add Product */
+
 .add-product-container {
-  padding: 20px;
-  background-color: #fff;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(27, 56, 32, 0.05);
   margin-top: 20px;
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--text-dark, #1b3820);
 }
-.add-product-container input {
-  border: 1px solid #333;
-  width: 20%;
-  color: #333;
-  outline: transparent;
-}
-.add-product-container input:nth-child(2),
-.add-product-container input:nth-child(3) {
-  padding: 2px;
-  padding-left: 10px;
-}
+
+.add-product-container input,
 .add-product-container select {
-  color: #333;
-  width: 20%;
+  border: 1.5px solid rgba(45, 85, 51, 0.18);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: var(--text-dark, #1b3820);
+  background: #ffffff;
+  outline: none;
+  font-size: 0.92rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(27, 56, 32, 0.03);
 }
+
+.add-product-container input:focus,
+.add-product-container select:focus {
+  border-color: var(--t, #3b7441);
+  box-shadow: 0 0 0 3px rgba(59, 116, 65, 0.15);
+}
+
 .add-product-container button {
-  background-color: #333;
-  padding: 5px 20px;
-  outline: transparent;
-  border: transparent;
+  background: linear-gradient(180deg, #3d7545 0%, #26542c 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 0 #143519, 0 6px 14px rgba(20, 53, 25, 0.28) !important;
+  padding: 10px 24px !important;
+  font-weight: 700 !important;
+  font-size: 0.92rem !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.add-product-container button:hover {
+  background: linear-gradient(180deg, #46844f 0%, #2c6033 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 #143519, 0 8px 18px rgba(20, 53, 25, 0.35) !important;
 }
