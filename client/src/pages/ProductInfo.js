@@ -131,8 +131,9 @@ const ProductInfo = () => {
 
   const getProduct = async () => {
     try {
+      const productName = params.name ? decodeURIComponent(params.name) : "";
       const res = await axios.post("/api/product/get-product-by-name", {
-        name: params.name,
+        name: productName,
       });
       if (res.data.success) {
         setProduct(res.data.data);

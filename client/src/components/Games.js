@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import "./Games.css";
 import Slider from "react-slick";
 
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return "/logo192.png";
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) return imagePath;
+  const cleanPath = imagePath.replace(/\\/g, "/").replace(/^\/+/, "");
+  return `/${cleanPath}`;
+};
+
+const norm = (str) => (str || "").toString().trim().toLowerCase();
+
 const Games = ({ title }) => {
   const navigate = useNavigate();
-  const [error, setError] = useState(null);
   const [products, setProducts] = useState(null);
   const [loading, setLoading] = useState(false);
   const [slider, setSlider] = useState("Mobile Games");
@@ -18,17 +25,13 @@ const Games = ({ title }) => {
     try {
       setLoading(true);
       const res = await axios.get("/api/product/get-all-products");
-      if (res.data.success) {
+      if (res.data.success && Array.isArray(res.data.data)) {
         setProducts(res.data.data);
-        setTimeout(() => {
-          setLoading(false);
-        }, 1000);
-      } else {
-        setLoading(false);
       }
     } catch (error) {
+      console.error("Error fetching products in Games component:", error);
+    } finally {
       setLoading(false);
-      console.log(error);
     }
   };
 
@@ -36,11 +39,11 @@ const Games = ({ title }) => {
     getAllProducts();
   }, []);
 
-  var settings = {
+  const settings = {
     dots: false,
     className: "center",
     infinite: false,
-    centerMode: false, // Ensures single slides are not centered
+    centerMode: false,
     centerPadding: "60px",
     slidesToShow: 6,
     swipeToSlide: true,
@@ -98,15 +101,18 @@ const Games = ({ title }) => {
         <div className="d-none d-md-block d-lg-block">
           <Slider {...settings}>
             {products?.map((item, index) => (
-              <div className="game-cont">
+              <div className="game-cont" key={item._id || index}>
                 <div
-                  key={index}
                   className="game"
-                  onClick={() => navigate(`/product/${item?.name}`)}
+                  onClick={() => navigate(`/product/${encodeURIComponent(item?.name)}`)}
                 >
                   <img
-                    src={`https://divinestoreorig/${item?.image}`}
-                    alt="pro-img"
+                    src={getImageUrl(item?.image)}
+                    alt={item?.name || "product"}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/logo192.png";
+                    }}
                   />
                   <div className="m-0 text-center">
                     <span>{item?.category}</span>
@@ -120,15 +126,18 @@ const Games = ({ title }) => {
         </div>
         <div className="mobile-game-cont d-block d-flex d-md-none d-lg-none">
           {products?.map((item, index) => (
-            <div className="game-cont">
+            <div className="game-cont" key={item._id || index}>
               <div
-                key={index}
                 className="game"
-                onClick={() => navigate(`/product/${item?.name}`)}
+                onClick={() => navigate(`/product/${encodeURIComponent(item?.name)}`)}
               >
                 <img
-                  src={`https://divinestoreorig/${item?.image}`}
-                  alt="pro-img"
+                  src={getImageUrl(item?.image)}
+                  alt={item?.name || "product"}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/logo192.png";
+                  }}
                 />
                 <div className="m-0 text-center">
                   <span>{item?.category}</span>
@@ -149,39 +158,20 @@ const Games = ({ title }) => {
 
   return (
     <div className="explore-products-container">
-      {renderCategory(slider, 10)}
+      {renderCategory()}
 
       <div className="game-filter-tabs promo-filter-tabs mt-3">
-        <button
-          onClick={() => setFilter("All")}
-          className={`${filter === "All" && "active"}`}
-        >
-          ALL
-        </button>
-        <button
-          onClick={() => setFilter("Mobile Games")}
-          className={`${filter === "Mobile Games" && "active"}`}
-        >
-          MOBILE GAMES
-        </button>
-        <button
-          onClick={() => setFilter("PC Games")}
-          className={`${filter === "PC Games" && "active"}`}
-        >
-          PC GAMES
-        </button>
-        <button
-          onClick={() => setFilter("Games Vouchers")}
-          className={`${filter === "Games Vouchers" && "active"}`}
-        >
-          GAMES VOUCHERS
-        </button>
-        <button
-          onClick={() => setFilter("Social Media Services")}
-          className={`${filter === "Social Media Services" && "active"}`}
-        >
-          SOCIAL MEDIA
-        </button>
+        {["All", "Mobile Games", "PC Games", "Games Vouchers", "Social Media Services"].map(
+          (tab) => (
+            <button
+              key={tab}
+              onClick={() => setFilter(tab)}
+              className={filter === tab ? "active" : ""}
+            >
+              {tab.toUpperCase()}
+            </button>
+          )
+        )}
       </div>
 
       <div className="game-search w-100 d-block d-lg-none">
@@ -196,7 +186,7 @@ const Games = ({ title }) => {
       <div className="game-container">
         {products
           ?.filter((item) => {
-            if (filter !== "All" && item.category !== filter) {
+            if (filter !== "All" && norm(item.category) !== norm(filter)) {
               return false;
             }
             if (
@@ -209,15 +199,18 @@ const Games = ({ title }) => {
           })
           ?.map((item, index) => {
             return (
-              <div className="game-cont">
+              <div className="game-cont" key={item._id || index}>
                 <div
-                  key={index}
                   className="game"
-                  onClick={() => navigate(`/product/${item?.name}`)}
+                  onClick={() => navigate(`/product/${encodeURIComponent(item?.name)}`)}
                 >
                   <img
-                    src={`https://divinestoreorig/${item?.image}`}
-                    alt="pro-img"
+                    src={getImageUrl(item?.image)}
+                    alt={item?.name || "product"}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/logo192.png";
+                    }}
                   />
                   <div className="m-0 text-center">
                     <span>{item?.category}</span>
@@ -234,3 +227,4 @@ const Games = ({ title }) => {
 };
 
 export default Games;
+

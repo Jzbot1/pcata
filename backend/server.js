@@ -10,13 +10,15 @@ const fs = require("fs");
 const colors = require("colors");
 const morgan = require("morgan"); // corrected spelling
 const dotenv = require("dotenv");
-const connectDB = require("./config/db");
+const { connectDB, isDBConnected } = require("./config/db");
 const cors = require("cors");
 const helmet = require("helmet");
 const bodyParser = require("body-parser");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
+const mongoSanitize = require("./middlewares/mongoSanitize");
+const globalApiLimiter = require("./middlewares/globalApiLimiter");
 
 require("./cron/yokcashStatusChecker.js");
 
@@ -77,9 +79,26 @@ app.use(
 app.use(express.json({ limit: "50mb" }));
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+app.use(mongoSanitize);
 app.use(morgan("dev"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static("build"));
+
+// Apply global rate limiting to all /api routes
+app.use("/api/", globalApiLimiter);
+
+// Health check and system diagnostics endpoint
+app.get("/api/health", (req, res) => {
+  const dbStatus = isDBConnected();
+  res.status(dbStatus ? 200 : 503).json({
+    status: dbStatus ? "UP" : "DEGRADED",
+    db: dbStatus ? "connected" : "disconnected",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memoryUsage: process.memoryUsage(),
+    nodeVersion: process.version,
+  });
+});
 
 // Middleware to check referer
 function checkReferer(req, res, next) {

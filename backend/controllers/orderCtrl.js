@@ -24,16 +24,31 @@ const getAllOrdersController = async (req, res) => {
 
 const getOrderByIdController = async (req, res) => {
   try {
-    const order = await orderModel.findOne({
-      orderId: req.body.orderId,
-    });
+    const { orderId, email } = req.body;
+    if (!orderId) {
+      return res.status(400).send({
+        success: false,
+        message: "Order ID is required",
+      });
+    }
+
+    const order = await orderModel.findOne({ orderId: String(orderId).trim() });
     if (!order) {
       return res.status(200).send({
         success: false,
         message: "No Order Found",
       });
     }
-    return res.status(201).send({
+
+    // IDOR Protection: Verify ownership unless admin
+    if (order.customer_email && email && order.customer_email !== email && !req.body.isAdmin) {
+      return res.status(403).send({
+        success: false,
+        message: "Unauthorized to view this order",
+      });
+    }
+
+    return res.status(200).send({
       success: true,
       message: "Order Fetched Success",
       data: order,

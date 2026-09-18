@@ -139,21 +139,18 @@ const updateProductController = async (req, res) => {
   }
 };
 
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const getAllProductsController = async (req, res) => {
   try {
-    const allProducts = await productModel.find({ isDeleted: false });
-    if (allProducts.length === 0) {
-      return res
-        .status(200)
-        .send({ success: false, message: "No Products Found" });
-    }
-    res.status(201).send({
+    const allProducts = await productModel.find({ isDeleted: { $ne: true } });
+    return res.status(200).send({
       success: true,
       message: "Products Fetched Success",
-      data: allProducts,
+      data: allProducts || [],
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error in getAllProductsController:", error);
     res.status(500).send({
       success: false,
       message: `Get All Products Controller ${error.message}`,
@@ -163,22 +160,26 @@ const getAllProductsController = async (req, res) => {
 
 const getProductController = async (req, res) => {
   try {
-    const product = await productModel.find({ _id: req.body.id });
-    if (product.length === 0) {
+    const { id } = req.body;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send({ success: false, message: "Invalid product ID" });
+    }
+    const product = await productModel.findById(id);
+    if (!product || product.isDeleted) {
       return res
-        .status(200)
+        .status(404)
         .send({ success: false, message: "No Product Found" });
     }
-    res.status(201).send({
+    res.status(200).send({
       success: true,
       message: "Product Fetched Success",
-      data: product[0],
+      data: product,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error in getProductController:", error);
     res.status(500).send({
       success: false,
-      message: `Get All Products Controller ${error.message}`,
+      message: `Get Product Controller ${error.message}`,
     });
   }
 };
@@ -187,27 +188,46 @@ const deleteProductController = async (req, res) => {
   try {
     const { id, image } = req.body;
 
-    const product = await productModel.findById({ _id: id });
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send({ success: false, message: "Invalid product ID" });
+    }
 
+    const product = await productModel.findById(id);
     if (!product) {
-      return res.status(201).send({
+      return res.status(404).send({
         success: false,
         message: "No product found",
       });
     }
 
-    const deleteProduct = await productModel.findByIdAndDelete({ _id: id });
+    const deleteProduct = await productModel.findByIdAndDelete(id);
     if (!deleteProduct) {
       return res.status(500).send({
         success: false,
         message: "Error deleting product. Please try again later.",
       });
     }
-    fs.unlinkSync(image);
+
+    // Safely attempt file removal if path is within project upload dirs
+    if (image && typeof image === "string") {
+      const normalizedPath = image.replace(/\\/g, "/");
+      if (!normalizedPath.includes("..")) {
+        const fullPath = path.join(process.cwd(), normalizedPath);
+        if (fs.existsSync(fullPath)) {
+          try {
+            fs.unlinkSync(fullPath);
+          } catch (unlinkErr) {
+            console.warn("Could not remove product image file:", unlinkErr.message);
+          }
+        }
+      }
+    }
+
     return res
       .status(200)
       .send({ success: true, message: "Product Deleted Successful" });
   } catch (error) {
+    console.error("Error in deleteProductController:", error);
     res.status(500).send({
       message: `Delete Product Ctrl ${error.message}`,
       success: false,
@@ -217,19 +237,42 @@ const deleteProductController = async (req, res) => {
 
 const getProductByNameController = async (req, res) => {
   try {
-    const product = await productModel.findOne({ name: req.body.name });
+    const rawName = (req.body.name || "").toString().trim();
+    if (!rawName) {
+      return res.status(400).send({
+        success: false,
+        message: "Product name is required",
+      });
+    }
+
+    // Exact or case-insensitive matching
+    let product = await productModel.findOne({
+      name: { $regex: new RegExp(`^${escapeRegex(rawName)}$`, "i") },
+      isDeleted: { $ne: true },
+    });
+
+    if (!product) {
+      // Fallback partial search if exact match not found
+      product = await productModel.findOne({
+        name: { $regex: new RegExp(escapeRegex(rawName), "i") },
+        isDeleted: { $ne: true },
+      });
+    }
+
     if (!product) {
       return res.status(200).send({
         success: false,
         message: "No Product Found",
       });
     }
-    return res.status(201).send({
+
+    return res.status(200).send({
       success: true,
       message: "Product Fetched Success",
       data: product,
     });
   } catch (error) {
+    console.error("Error in getProductByNameController:", error);
     res.status(500).send({
       message: `Product By Name Ctrl ${error.message}`,
       success: false,

@@ -4,10 +4,11 @@ const paymentModel = require("../models/paymentModel");
 const md5 = require("md5");
 const querystring = require("querystring");
 const authMiddleware = require("../middlewares/authMiddleware");
+const adminAuthMiddleware = require("../middlewares/adminAuthMiddleware");
 const generalRateLimiter = require("../middlewares/generalRateLimiter");
 const router = express.Router();
 
-router.get("/get-all-payments", authMiddleware, async (req, res) => {
+router.get("/get-all-payments", adminAuthMiddleware, async (req, res) => {
   try {
     const payments = await paymentModel.find({});
     if (payments.length === 0) {
