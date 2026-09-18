@@ -310,4 +310,46 @@
   .admin-recent-things {
     grid-template-columns: 1fr;
   }
+  .admin-dashboard-container {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+  .dash-card {
+    padding: 14px 16px;
+    min-height: 95px;
+  }
+  .dash-card .count h1,
+  .dash-card .count h2,
+  .dash-card .count h3 {
+    font-size: 1.15rem;
+  }
+  .dash-icon-box {
+    width: 38px;
+    height: 38px;
+  }
+  .dashboard-header-banner {
+    padding: 18px 20px;
+  }
+  .dashboard-header-actions {
+    width: 100%;
+  }
+  .dashboard-header-actions button {
+    flex: 1;
+    font-size: 0.82rem;
+    padding: 8px 12px;
+  }
 }
+
+@media screen and (max-width: 480px) {
+  .admin-dashboard-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .dash-card {
+    padding: 12px 14px;
+  }
+  .dash-card .count span.dash-label {
+    font-size: 0.72rem;
+  }
+}
+
