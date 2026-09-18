@@ -8,6 +8,13 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./AdminUsers.css";
 
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return "/logo192.png";
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) return imagePath;
+  const cleanPath = imagePath.replace(/\\/g, "/").replace(/^\/+/, "");
+  return `/${cleanPath}`;
+};
+
 const AdminProduct = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState(null);
@@ -121,8 +128,12 @@ const AdminProduct = () => {
                   <tr key={index}>
                     <td>
                       <img
-                        src={`https://zelanstore.com/${product?.image}`}
-                        alt=""
+                        src={getImageUrl(product?.image)}
+                        alt={product?.name || "Product"}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = "/logo192.png";
+                        }}
                       />
                     </td>
                     <td>

@@ -4,6 +4,7 @@ import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import StayCurrentPortraitIcon from "@mui/icons-material/StayCurrentPortrait";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import HelpIcon from "@mui/icons-material/Help";
+import BuildCircleIcon from "@mui/icons-material/BuildCircle";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { message } from "antd";
@@ -20,6 +21,7 @@ const AdminDashboard = () => {
   const [queries, setQueries] = useState(null);
   const [tabs, setTabs] = useState(0);
   const [toggle, setToggle] = useState(true);
+  const [isMaintenance, setIsMaintenance] = useState(false);
   const [smileBalance, setSmilebalance] = useState("");
   const [yokcashBalance, setYokcashBalance] = useState("");
   const [moogoldBalance, setMoogoldBalance] = useState("");
@@ -228,6 +230,17 @@ const AdminDashboard = () => {
     }
   };
 
+  const getMaintenanceStatus = async () => {
+    try {
+      const res = await axios.get("/api/maintenance/status");
+      if (res.data.success && res.data.data) {
+        setIsMaintenance(res.data.data.isMaintenance);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     getSmilebalance();
     getYokcashBalance();
@@ -235,6 +248,7 @@ const AdminDashboard = () => {
     getAllOrders();
     getAllQueries();
     getAllProducts();
+    getMaintenanceStatus();
   }, []);
 
   const calculateMonthlyOrders = () => {
@@ -512,6 +526,18 @@ const AdminDashboard = () => {
             <span className="title">Queries</span>
           </div>
           <HelpIcon className="icon" />
+        </div>
+
+        <div className="dash-card" onClick={() => navigate("/admin-maintenance")}>
+          <div className="count">
+            <h2 className="m-0">
+              <span className={`badge ${isMaintenance ? "bg-danger" : "bg-success"}`} style={{ fontSize: "1rem" }}>
+                {isMaintenance ? "ACTIVE ⚠️" : "OFF (LIVE) 🟢"}
+              </span>
+            </h2>
+            <span className="text-muted">Maintenance Mode</span>
+          </div>
+          <BuildCircleIcon className="icon text-warning" />
         </div>
       </div>
       <div className="admin-recent-things">

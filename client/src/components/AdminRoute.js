@@ -6,6 +6,8 @@ import { setUser } from "../redux/features/userSlice";
 import { message } from "antd";
 import Loader from "./Loader";
 
+const SUPER_ADMIN_EMAIL = "zomuansangajacob523@gmail.com";
+
 export default function AdminRoute({ children }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -23,11 +25,16 @@ export default function AdminRoute({ children }) {
         );
 
         if (res.data.success) {
-          dispatch(setUser(res.data.data.user));
+          const fetchedUser = res.data.data.user;
+          dispatch(setUser(fetchedUser));
 
-          if (!res.data.data.user.isAdmin) {
+          const isSuperAdmin =
+            fetchedUser?.email &&
+            fetchedUser.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
+
+          if (!fetchedUser.isAdmin && !isSuperAdmin) {
             message.error("Access Denied! Admins only.");
-            navigate("/user-dashboard"); // नॉर्मल यूज़र को डैशबोर्ड पर भेजें
+            navigate("/user-dashboard");
           }
         } else {
           message.error("Session expired! Please login again.");

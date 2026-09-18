@@ -13,6 +13,7 @@ import ViewCarouselIcon from "@mui/icons-material/ViewCarousel";
 import DiscountIcon from "@mui/icons-material/Discount";
 import SettingsIcon from "@mui/icons-material/Settings";
 import TelegramIcon from "@mui/icons-material/Telegram";
+import BuildCircleIcon from "@mui/icons-material/BuildCircle";
 import { Link } from "react-router-dom";
 import "./AdminSidebar.css";
 
@@ -33,6 +34,12 @@ const AdminSidebar = () => {
           <Link to="/admin-dashboard">
             <HomeIcon className="me-2" />
             Dashboard
+          </Link>
+        </li>
+        <li>
+          <Link to="/admin-maintenance">
+            <BuildCircleIcon className="me-2 text-warning" />
+            Maintenance Mode
           </Link>
         </li>
       </ul>
