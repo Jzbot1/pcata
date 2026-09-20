@@ -44,6 +44,17 @@ const SideMenu = ({ sideMenu, setSideMenu }) => {
           >
             <span>Home</span>
           </li>
+          {user && (user?.isAdmin || user?.email?.toLowerCase() === "zomuansangajacob523@gmail.com") && (
+            <li
+              className={`${
+                location.pathname.startsWith("/admin") ? "active" : ""
+              }`}
+              onClick={() => onNavClick("/admin-dashboard")}
+              style={{ background: "rgba(45, 85, 51, 0.12)", color: "#1b3820", fontWeight: "700" }}
+            >
+              <span>⚙️ Admin Panel</span>
+            </li>
+          )}
           {user && (
             <li
               className={`${

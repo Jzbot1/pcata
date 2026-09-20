@@ -1,6 +1,6 @@
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
@@ -134,15 +134,20 @@ function App() {
         <Route
           path="/register"
           element={
-            <Register />
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
           }
         />
         <Route
           path="/login"
           element={
-            <Login />
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
           }
         />
+        <Route path="/admin" element={<Navigate to="/admin-dashboard" replace />} />
         <Route path="/forgot-password" element={<ForgotPass />} />
         <Route path="/games" element={renderWithMaintenanceGuard(<GamePage />)} />
         <Route path="/search" element={renderWithMaintenanceGuard(<Search />)} />

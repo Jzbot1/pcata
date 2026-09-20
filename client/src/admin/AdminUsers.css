@@ -169,26 +169,25 @@
 }
 
 /* ACTION BUTTONS */
-.user-table svg {
-  cursor: pointer;
-  padding: 6px;
-  width: 32px;
-  height: 32px;
+.user-table .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 8px;
-  background: rgba(45, 85, 51, 0.08);
-  color: var(--p, #1b3820);
+  font-weight: 600;
   transition: all 0.18s ease;
 }
 
-.user-table svg:hover {
-  background: var(--bg-button);
-  color: #fff !important;
-  transform: scale(1.1);
+.user-table .btn svg {
+  padding: 0;
+  width: auto;
+  height: auto;
+  background: transparent !important;
+  color: inherit !important;
 }
 
-.user-table svg.text-danger:hover {
-  background: #dc3545 !important;
-  color: #fff !important;
+.user-table .btn:hover {
+  transform: translateY(-1px);
 }
 
 /* PAGINATION */

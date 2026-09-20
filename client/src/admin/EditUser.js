@@ -20,6 +20,7 @@ const EditUser = () => {
     password: "",
     balanceChange: "",
     reseller: "no",
+    block: "no",
   });
 
   const handleChange = (e) => {
@@ -29,7 +30,6 @@ const EditUser = () => {
   // GET USER DETAILS
   const getUser = async () => {
     try {
-
       const res = await axios.post(
         "/api/admin/get-user",
         { id: params.id },
@@ -41,7 +41,6 @@ const EditUser = () => {
       );
 
       if (res.data.success) {
-
         const u = res.data.data;
 
         setUser({
@@ -49,14 +48,13 @@ const EditUser = () => {
           email: u.email || "",
           mobile: u.mobile || "",
           reseller: u.reseller || "no",
+          block: u.block || "no",
           password: "",
           balanceChange: "",
         });
-
       }
 
       setLoading(false);
-
     } catch (error) {
       console.log(error);
       setLoading(false);
@@ -200,6 +198,24 @@ const EditUser = () => {
                 >
                   <option value="no">User</option>
                   <option value="yes">Reseller</option>
+                </select>
+              </div>
+
+              <div className="form-fields mb-4">
+                <label className="form-label">Account Status (Block / Unblock)</label>
+                <select
+                  className="form-select"
+                  name="block"
+                  value={user.block}
+                  onChange={handleChange}
+                  style={{
+                    fontWeight: "700",
+                    color: user.block === "yes" ? "#dc3545" : "#198754",
+                    borderColor: user.block === "yes" ? "#dc3545" : "#198754",
+                  }}
+                >
+                  <option value="no">Active (Unblocked)</option>
+                  <option value="yes">Blocked (Access Restricted)</option>
                 </select>
               </div>
 

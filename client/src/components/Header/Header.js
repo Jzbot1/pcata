@@ -79,6 +79,13 @@ const Header = () => {
                   <Link to="/user-dashboard">Dashboard</Link>
                 </li>
               )}
+              {user && (user?.isAdmin || user?.email?.toLowerCase() === "zomuansangajacob523@gmail.com") && (
+                <li>
+                  <Link to="/admin-dashboard" style={{ color: "#22c55e", fontWeight: "700" }}>
+                    Admin Panel
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 

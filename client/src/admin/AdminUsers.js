@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import AdminLayout from "./components/AdminLayout";
-import { message, Pagination, Select } from "antd";
+import { message, Pagination, Select, Popconfirm, Tag, Tooltip } from "antd";
 import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from "@mui/icons-material/Edit";
+import BlockIcon from "@mui/icons-material/Block";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./AdminUsers.css";
@@ -17,14 +19,10 @@ const AdminUsers = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage, setUsersPerPage] = useState(50); // Default number of items per page
   const [originalAllUser, setOriginalAllUser] = useState(null);
+  const [actionLoadingId, setActionLoadingId] = useState(null);
 
   // Pagination logic
-  const totalUsers = allUser?.length;
-  const totalPages = Math.ceil(totalUsers / usersPerPage);
-
-  const handlePagination = (page) => {
-    setCurrentPage(page);
-  };
+  const totalUsers = allUser?.length || 0;
 
   // Pagination change handler
   const onPageChange = (page) => {
@@ -40,7 +38,11 @@ const AdminUsers = () => {
       setFilteredUsers(null);
     } else {
       const filtered = allUser?.filter((user) => {
-        return user?.email.toLowerCase().includes(searchQuery.toLowerCase());
+        return (
+          user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          user?.fname?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          user?.mobile?.includes(searchQuery)
+        );
       });
       setFilteredUsers(filtered);
     }
@@ -55,13 +57,66 @@ const AdminUsers = () => {
         },
       });
       if (res.data.success) {
-        setAllUser(res.data.data);
-        setOriginalAllUser(res.data.data);
+        // Sort newest first
+        const sorted = (res.data.data || []).slice().reverse();
+        setAllUser(sorted);
+        setOriginalAllUser(sorted);
       } else {
         message.error(res.data.message);
       }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const handleToggleBlock = async (userId, currentStatus) => {
+    try {
+      setActionLoadingId(userId);
+      const nextStatus = currentStatus === "yes" ? "no" : "yes";
+      const res = await axios.post(
+        "/api/admin/toggle-block-user",
+        { userId, block: nextStatus },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+      setActionLoadingId(null);
+      if (res.data.success) {
+        message.success(res.data.message);
+        setAllUser((prev) =>
+          prev
+            ? prev.map((u) =>
+                u._id === userId ? { ...u, block: nextStatus } : u
+              )
+            : []
+        );
+        setOriginalAllUser((prev) =>
+          prev
+            ? prev.map((u) =>
+                u._id === userId ? { ...u, block: nextStatus } : u
+              )
+            : []
+        );
+        if (filteredUsers) {
+          setFilteredUsers((prev) =>
+            prev
+              ? prev.map((u) =>
+                  u._id === userId ? { ...u, block: nextStatus } : u
+                )
+              : []
+          );
+        }
+      } else {
+        message.error(res.data.message);
+      }
+    } catch (error) {
+      setActionLoadingId(null);
+      console.error(error);
+      message.error(
+        error?.response?.data?.message || "Failed to update block status"
+      );
     }
   };
 
@@ -81,7 +136,7 @@ const AdminUsers = () => {
       <div className="admin-users-container">
         <div className="page-title">
           <h3 className="m-0">Customers</h3>
-          <h6>Total Users - {allUser?.length}</h6>
+          <h6>Total Users - {allUser?.length || 0}</h6>
         </div>
         <hr />
         <div className="table-container">
@@ -92,7 +147,7 @@ const AdminUsers = () => {
                 className="mb-4"
                 type="search"
                 name="search"
-                placeholder="Search by email"
+                placeholder="Search by email, name or mobile"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -100,12 +155,12 @@ const AdminUsers = () => {
             <Select
               defaultValue="50"
               style={{ width: 120 }}
-              onChange={(value) => setUsersPerPage(value)}
+              onChange={(value) => setUsersPerPage(Number(value))}
             >
-              <Option value="10">10</Option>
-              <Option value="20">20</Option>
-              <Option value="50">50</Option>
-              <Option value="100">100</Option>
+              <Option value="10">10 / page</Option>
+              <Option value="20">20 / page</Option>
+              <Option value="50">50 / page</Option>
+              <Option value="100">100 / page</Option>
             </Select>
           </div>
           <table className="table user-table">
@@ -114,35 +169,48 @@ const AdminUsers = () => {
                 <th>Name</th>
                 <th>Email</th>
                 <th>Mobile</th>
-                <th>Reseller</th>
-                <th>Block</th>
+                <th>Role</th>
+                <th>Status</th>
                 <th>Balance</th>
                 <th>Created At</th>
-                <th>Action</th>
+                <th style={{ textAlign: "center" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {currentUsers &&
-                currentUsers.reverse()?.map((user, index) => {
+                currentUsers.map((user, index) => {
+                  const isBlocked = user?.block === "yes";
                   return (
-                    <tr key={index}>
+                    <tr key={user?._id || index}>
                       <td>
-                        <small>{user?.fname}</small>
+                        <small className="fw-bold">{user?.fname || "N/A"}</small>
                       </td>
                       <td>
                         <small>{user?.email}</small>
                       </td>
                       <td>
-                        <small>{user?.mobile}</small>
+                        <small>{user?.mobile || "N/A"}</small>
                       </td>
                       <td>
-                        <small>{user?.reseller}</small>
+                        <Tag color={user?.reseller === "yes" ? "purple" : "blue"}>
+                          {user?.reseller === "yes" ? "Reseller" : "Customer"}
+                        </Tag>
                       </td>
                       <td>
-                        <small>{user?.block}</small>
+                        {isBlocked ? (
+                          <Tag color="error" style={{ fontWeight: 600 }}>
+                            Blocked
+                          </Tag>
+                        ) : (
+                          <Tag color="success" style={{ fontWeight: 600 }}>
+                            Active
+                          </Tag>
+                        )}
                       </td>
                       <td>
-                        <small>{user?.balance}</small>
+                        <small className="fw-bold text-success">
+                          ₹{parseFloat(user?.balance || 0).toFixed(2)}
+                        </small>
                       </td>
                       <td>
                         <small>
@@ -151,21 +219,86 @@ const AdminUsers = () => {
                                 "en-US",
                                 {
                                   year: "numeric",
-                                  month: "long",
+                                  month: "short",
                                   day: "numeric",
                                 }
                               )
-                            : ""}
+                            : "N/A"}
                         </small>
                       </td>
                       <td>
-                        <div className="d-flex gap-2">
-                          <EditIcon
-                            onClick={() =>
-                              navigate(`/admin-edit-user/${user?._id}`)
+                        <div className="d-flex align-items-center justify-content-center gap-2">
+                          <Tooltip title="Edit User">
+                            <button
+                              className="btn btn-sm btn-light border p-1"
+                              onClick={() =>
+                                navigate(`/admin-edit-user/${user?._id}`)
+                              }
+                              style={{ lineHeight: 1 }}
+                            >
+                              <EditIcon
+                                style={{ fontSize: 18, color: "#2d5533" }}
+                              />
+                            </button>
+                          </Tooltip>
+
+                          <Popconfirm
+                            title={
+                              isBlocked
+                                ? "Unblock this user?"
+                                : "Block this user?"
                             }
-                            className="me-2 text-muted"
-                          />
+                            description={
+                              isBlocked
+                                ? "This user will regain access to login and place orders."
+                                : "This user will be logged out and prohibited from logging in or placing orders."
+                            }
+                            onConfirm={() =>
+                              handleToggleBlock(user?._id, user?.block)
+                            }
+                            okText={isBlocked ? "Yes, Unblock" : "Yes, Block"}
+                            cancelText="Cancel"
+                            okButtonProps={{
+                              danger: !isBlocked,
+                              loading: actionLoadingId === user?._id,
+                            }}
+                          >
+                            <Tooltip
+                              title={
+                                isBlocked ? "Unblock Customer" : "Block Customer"
+                              }
+                            >
+                              <button
+                                className={`btn btn-sm ${
+                                  isBlocked
+                                    ? "btn-success"
+                                    : "btn-outline-danger"
+                                } p-1`}
+                                style={{
+                                  lineHeight: 1,
+                                  borderRadius: 8,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 4,
+                                  fontSize: "0.75rem",
+                                  fontWeight: 600,
+                                }}
+                                disabled={actionLoadingId === user?._id}
+                              >
+                                {isBlocked ? (
+                                  <>
+                                    <LockOpenIcon style={{ fontSize: 16 }} />
+                                    <span>Unblock</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <BlockIcon style={{ fontSize: 16 }} />
+                                    <span>Block</span>
+                                  </>
+                                )}
+                              </button>
+                            </Tooltip>
+                          </Popconfirm>
                         </div>
                       </td>
                     </tr>

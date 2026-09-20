@@ -66,7 +66,10 @@ const registerController = async (req, res) => {
 };
 const loginController = async (req, res) => {
   try {
-    const user = await userModel.findOne({ email: req.body.email });
+    const inputEmail = req.body.email ? req.body.email.trim() : "";
+    const user = await userModel.findOne({
+      email: { $regex: new RegExp(`^${inputEmail}$`, "i") },
+    });
     if (!user) {
       return res
         .status(200)
@@ -79,17 +82,22 @@ const loginController = async (req, res) => {
         .send({ success: false, message: "Invalid Credentials" });
     }
 
+    if (user.block === "yes") {
+      return res.status(403).send({
+        success: false,
+        message: "Your account is blocked. Please contact support.",
+      });
+    }
+
     const isAdmin = user?.isAdmin || false;
-    const expiresIn = isAdmin ? "30d" : "30d";
+    const expiresIn = "30d";
 
     const token = jwt.sign({ id: user._id, isAdmin }, process.env.JWT_SECRET, {
       expiresIn: expiresIn,
     });
 
-    if (isMatch) {
-      user.lastLogin = new Date();
-      await user.save();
-    }
+    user.lastLogin = new Date();
+    await user.save();
 
     return res
       .status(200)
@@ -97,7 +105,7 @@ const loginController = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send({
-      success: true,
+      success: false,
       message: `Login Controller ${error.message}`,
     });
   }

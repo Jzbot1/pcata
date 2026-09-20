@@ -46,6 +46,14 @@ module.exports = async (req, res, next) => {
         });
       }
 
+      // Check if user is blocked
+      if (user.block === "yes") {
+        return res.status(403).json({
+          success: false,
+          message: "Your account is blocked. Please contact support.",
+        });
+      }
+
       // 🛡️ Secure the email: override any frontend-sent value
       delete req.body.email;
       delete req.body.customer_email;

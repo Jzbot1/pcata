@@ -6,6 +6,7 @@ const {
   getAllUserController,
   getUserController,
   editUserController,
+  toggleBlockUserController,
   adminGetAllOrdersController,
   adminUpdateOrderController,
   getAllQueries,
@@ -26,6 +27,7 @@ router.get("/smile-balance", adminAuthMiddleware, smileBalanceController);
 router.get("/moogold-balance", adminAuthMiddleware, moogoldBalanceController);
 router.post("/get-user", adminAuthMiddleware, getUserController);
 router.post("/admin-edit-user", adminAuthMiddleware, editUserController);
+router.post("/toggle-block-user", adminAuthMiddleware, toggleBlockUserController);
 router.get(
   "/admin-get-all-orders",
   adminAuthMiddleware,

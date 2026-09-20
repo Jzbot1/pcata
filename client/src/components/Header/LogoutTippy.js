@@ -8,9 +8,19 @@ import { useDispatch } from "react-redux";
 import { setUser } from "../../redux/features/userSlice";
 import "./Header.css";
 
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+
+const SUPER_ADMIN_EMAIL = "zomuansangajacob523@gmail.com";
+
 const LogoutTippy = ({ user }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const isAdmin = Boolean(
+    user?.isAdmin ||
+      (user?.email &&
+        user.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase())
+  );
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -19,13 +29,18 @@ const LogoutTippy = ({ user }) => {
   };
 
   const getUserData = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      dispatch(setUser(null));
+      return;
+    }
     axios
       .post(
         "/api/user/getUserData",
         {},
         {
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
+            Authorization: "Bearer " + token,
           },
         }
       )
@@ -50,6 +65,16 @@ const LogoutTippy = ({ user }) => {
     <div className="logout-tippy">
       {user && user ? (
         <>
+          {isAdmin && (
+            <div className="section-1" style={{ borderBottom: "1px solid rgba(0,0,0,0.06)", paddingBottom: "6px" }}>
+              <span>
+                <AdminPanelSettingsIcon className="me-2 icon text-success" />
+              </span>
+              <span onClick={() => navigate("/admin-dashboard")} style={{ fontWeight: "700", color: "#2d5533" }}>
+                Admin Panel
+              </span>
+            </div>
+          )}
           <div className="section-1">
             <span>
               <Person2Icon className="me-2 icon" />

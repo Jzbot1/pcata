@@ -61,7 +61,7 @@ const getUserController = async (req, res) => {
 
 const editUserController = async (req, res) => {
   try {
-    const { _id, fname, email, mobile, password, balanceChange, reseller } =
+    const { _id, fname, email, mobile, password, balanceChange, reseller, block } =
       req.body;
 
     if (!_id) {
@@ -116,16 +116,22 @@ const editUserController = async (req, res) => {
       hashedPassword = await bcrypt.hash(password, salt);
     }
 
+    const updateFields = {
+      fname,
+      email,
+      mobile,
+      password: hashedPassword,
+      balance: newBalance,
+      reseller,
+    };
+
+    if (block !== undefined) {
+      updateFields.block = block;
+    }
+
     const updatedUser = await userModel.findByIdAndUpdate(
       _id,
-      {
-        fname,
-        email,
-        mobile,
-        password: hashedPassword,
-        balance: newBalance,
-        reseller,
-      },
+      updateFields,
       { new: true }
     );
 
@@ -139,6 +145,60 @@ const editUserController = async (req, res) => {
     return res.status(500).send({
       success: false,
       message: "Error in Edit User API",
+    });
+  }
+};
+
+const toggleBlockUserController = async (req, res) => {
+  try {
+    const { userId, id, block } = req.body;
+    const targetUserId = userId || id;
+
+    if (!targetUserId) {
+      return res.status(400).send({
+        success: false,
+        message: "Target User ID is required",
+      });
+    }
+
+    const targetUser = await userModel.findById(targetUserId);
+    if (!targetUser) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Protect super admin or admin accounts from being blocked accidentally
+    const SUPER_ADMIN_EMAIL = (process.env.SUPER_ADMIN_EMAIL || "zomuansangajacob523@gmail.com").toLowerCase();
+    if (
+      targetUser.email &&
+      (targetUser.email.toLowerCase() === SUPER_ADMIN_EMAIL ||
+        targetUser.isAdmin)
+    ) {
+      return res.status(403).send({
+        success: false,
+        message: "Admin accounts cannot be blocked",
+      });
+    }
+
+    const newBlockStatus = block !== undefined ? block : (targetUser.block === "yes" ? "no" : "yes");
+    targetUser.block = newBlockStatus;
+    await targetUser.save();
+
+    return res.status(200).send({
+      success: true,
+      message:
+        newBlockStatus === "yes"
+          ? "User blocked successfully"
+          : "User unblocked successfully",
+      data: targetUser,
+    });
+  } catch (error) {
+    console.error("toggleBlockUserController Error:", error);
+    return res.status(500).send({
+      success: false,
+      message: `Toggle Block User error: ${error.message}`,
     });
   }
 };
@@ -542,6 +602,7 @@ module.exports = {
   getAllUserController,
   getUserController,
   editUserController,
+  toggleBlockUserController,
   adminGetAllOrdersController,
   adminUpdateOrderController,
   addCouponController,
