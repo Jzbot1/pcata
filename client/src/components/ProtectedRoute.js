@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import axios from "axios";
 import { setUser } from "../redux/features/userSlice";
 import { message } from "antd";
@@ -8,14 +8,29 @@ import Loader from "./Loader";
 
 export default function ProtectedRoute({ children }) {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user.user);
   const token = localStorage.getItem("token");
-  const [loading, setLoading] = useState(true); // Token ho toh loading true ho, warna false
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
     if (!token) {
-      setLoading(false); // Token nahi hai toh loading off kar do
+      setLoading(false);
       return;
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      if (payload?.exp && payload.exp * 1000 < Date.now()) {
+        localStorage.removeItem("token");
+        if (isMounted) {
+          setLoading(false);
+          message.error("Session expired! Please login again.");
+        }
+        return;
+      }
+    } catch (e) {
+      // Continue
     }
 
     const fetchUser = async () => {
@@ -28,30 +43,38 @@ export default function ProtectedRoute({ children }) {
           }
         );
 
-        if (data.success) {
+        if (!isMounted) return;
+
+        if (data?.success && data?.data?.user) {
           dispatch(setUser(data.data.user));
         } else {
-          message.error("Session expired, please login again");
-          localStorage.removeItem("token");
+          if (data?.message?.toLowerCase().includes("session") || data?.message?.toLowerCase().includes("token")) {
+            localStorage.removeItem("token");
+          }
         }
       } catch (error) {
-        message.error("Error fetching user data");
-        localStorage.removeItem("token");
+        console.error("ProtectedRoute error fetching user data:", error);
+        if (error.response && error.response.status === 401) {
+          localStorage.removeItem("token");
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
-    if (token) fetchUser();
-    else setLoading(false);
-  }, [token, dispatch]); 
+    fetchUser();
 
-  if (loading) return <Loader />; // Loader sirf tab dikhe jab data load ho raha ho
+    return () => {
+      isMounted = false;
+    };
+  }, [token, dispatch]);
 
-  if (!token){
-    message.error("please login")
-    return <Navigate to="/login" replace />; // Agar token nahi hai toh login pe redirect kar do
+  if (loading) return <Loader />;
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
   }
 
-  return children; // Authenticated user ke liye content dikhao
+  return children;
 }
+

@@ -6,7 +6,11 @@ import { setUser } from "../redux/features/userSlice";
 import { message } from "antd";
 import Loader from "./Loader";
 
-const SUPER_ADMIN_EMAIL = "zomuansangajacob523@gmail.com";
+const SUPER_ADMIN_EMAILS = [
+  "zomuansangajacob523@gmail.com",
+  "mszapachuau@gmail.com",
+  "aashirdigital@gmail.com",
+];
 
 export default function SuperAdminRoute({ children }) {
   const dispatch = useDispatch();
@@ -16,7 +20,29 @@ export default function SuperAdminRoute({ children }) {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const getUser = async () => {
+    let isMounted = true;
+
+    const checkSuperAdminAuth = async () => {
+      if (!token) {
+        if (isMounted) setLoading(false);
+        return;
+      }
+
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        if (payload?.exp && payload.exp * 1000 < Date.now()) {
+          localStorage.removeItem("token");
+          if (isMounted) {
+            setLoading(false);
+            message.error("Session expired! Please login again.");
+            navigate("/login");
+          }
+          return;
+        }
+      } catch (e) {
+        // Continue
+      }
+
       try {
         const res = await axios.post(
           "/api/user/getUserData",
@@ -24,38 +50,44 @@ export default function SuperAdminRoute({ children }) {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        if (res.data.success) {
+        if (!isMounted) return;
+
+        if (res.data?.success && res.data?.data?.user) {
           const fetchedUser = res.data.data.user;
           dispatch(setUser(fetchedUser));
 
           const isSuperAdmin =
-            fetchedUser.isAdmin &&
-            fetchedUser.email &&
-            fetchedUser.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
+            fetchedUser?.email &&
+            SUPER_ADMIN_EMAILS.some(
+              (em) => em.toLowerCase() === fetchedUser.email.toLowerCase()
+            );
 
           if (!isSuperAdmin) {
             message.error("Access Denied: Only Super Admin can access Payment Settings");
             navigate("/admin-dashboard");
           }
         } else {
-          message.error("Session expired! Please login again.");
-          localStorage.removeItem("token");
-          navigate("/login");
+          if (res.data?.message?.toLowerCase().includes("session") || res.data?.message?.toLowerCase().includes("token")) {
+            localStorage.removeItem("token");
+            navigate("/login");
+          }
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
-        localStorage.removeItem("token");
-        navigate("/login");
+        console.error("SuperAdminRoute error fetching user data:", error);
+        if (error.response && error.response.status === 401) {
+          localStorage.removeItem("token");
+          if (isMounted) navigate("/login");
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
-    if (token) {
-      getUser();
-    } else {
-      setLoading(false);
-    }
+    checkSuperAdminAuth();
+
+    return () => {
+      isMounted = false;
+    };
   }, [token, dispatch, navigate]);
 
   if (loading) {
@@ -63,18 +95,19 @@ export default function SuperAdminRoute({ children }) {
   }
 
   if (!token) {
-    message.error("Please login");
     return <Navigate to="/login" replace />;
   }
 
   const isSuperAdmin =
-    user?.isAdmin &&
     user?.email &&
-    user?.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
+    SUPER_ADMIN_EMAILS.some(
+      (em) => em.toLowerCase() === user.email.toLowerCase()
+    );
 
-  if (!isSuperAdmin) {
+  if (user && !isSuperAdmin) {
     return <Navigate to="/admin-dashboard" replace />;
   }
 
   return children;
 }
+

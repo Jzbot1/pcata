@@ -1,14 +1,12 @@
 import axios from "axios";
 import CryptoJS from "crypto-js";
-import { useDispatch } from "react-redux";
 
 const getUserData = async (dispatch = () => {}, setUser = () => {}, setbalance = () => {}) => {
   try {
     const token = localStorage.getItem("token");
-    console.log("Getuser token data:", token);
 
     if (!token) {
-      throw new Error("Token not found in localStorage.");
+      return false;
     }
 
     const res = await axios.post(
@@ -21,46 +19,58 @@ const getUserData = async (dispatch = () => {}, setUser = () => {}, setbalance =
       }
     );
 
-    if (res.data?.success) {
-      try {
-        const { user, id, key: encryptedKey, iv: encryptedIv } = res.data.data;
+    if (res.data?.success && res.data?.data) {
+      const { user, id, key: encryptedKey, iv: encryptedIv } = res.data.data;
 
-        if (!user || !id || !encryptedKey || !encryptedIv) {
-          throw new Error("Incomplete encrypted response from server.");
+      let decryptedBalance = "0";
+      if (id && encryptedKey && encryptedIv) {
+        try {
+          const key = CryptoJS.enc.Hex.parse(encryptedKey);
+          const iv = CryptoJS.enc.Hex.parse(encryptedIv);
+          const decrypted = CryptoJS.AES.decrypt(
+            { ciphertext: CryptoJS.enc.Hex.parse(id) },
+            key,
+            { iv: iv }
+          ).toString(CryptoJS.enc.Utf8);
+
+          if (decrypted !== undefined && decrypted !== null && decrypted !== "") {
+            decryptedBalance = decrypted;
+          }
+        } catch (decryptErr) {
+          console.warn("Balance decryption warning (using fallback 0):", decryptErr);
+          decryptedBalance = user?.balance?.toString() || "0";
         }
-
-        const key = CryptoJS.enc.Hex.parse(encryptedKey);
-        const iv = CryptoJS.enc.Hex.parse(encryptedIv);
-        const decryptedBalance = CryptoJS.AES.decrypt(
-          { ciphertext: CryptoJS.enc.Hex.parse(id) },
-          key,
-          { iv: iv }
-        ).toString(CryptoJS.enc.Utf8);
-
-        if (!decryptedBalance) {
-          throw new Error("Failed to decrypt balance.");
-        }
-
-        setbalance(decryptedBalance);
-        if (typeof dispatch === "function") dispatch(setUser(user));
-        return true;
-      } catch (innerError) {
-        console.error("Decryption or state update failed:", innerError);
-        localStorage.removeItem("token");
-        dispatch(setUser(null));
-        return false;
+      } else if (user?.balance !== undefined) {
+        decryptedBalance = user.balance.toString();
       }
+
+      if (typeof setbalance === "function") {
+        setbalance(decryptedBalance);
+      }
+
+      if (user && typeof dispatch === "function") {
+        dispatch(setUser(user));
+      }
+
+      return true;
     } else {
-      localStorage.removeItem("token");
-      dispatch(setUser(null));
+      // If server explicitly returned success: false or invalid response
+      if (res.data?.message?.toLowerCase().includes("session") || res.data?.message?.toLowerCase().includes("token")) {
+        localStorage.removeItem("token");
+        if (typeof dispatch === "function") dispatch(setUser(null));
+      }
       return false;
     }
   } catch (error) {
     console.error("getUserData error:", error);
-    localStorage.removeItem("token");
-    dispatch(setUser(null));
+    // Only remove token if server explicitly responded with 401 Unauthorized
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("token");
+      if (typeof dispatch === "function") dispatch(setUser(null));
+    }
     return false;
   }
 };
 
 export default getUserData;
+

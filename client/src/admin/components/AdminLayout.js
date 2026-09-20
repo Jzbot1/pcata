@@ -2,9 +2,14 @@ import React, { useEffect, useState } from "react";
 import AdminHeader from "./AdminHeader";
 import AdminSidebar from "./AdminSidebar";
 import AdminSidemenu from "./AdminSidemenu";
-import AdminMobileBottomNav from "./AdminMobileBottomNav";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+
+const SUPER_ADMIN_EMAILS = [
+  "zomuansangajacob523@gmail.com",
+  "mszapachuau@gmail.com",
+  "aashirdigital@gmail.com",
+];
 
 const AdminLayout = ({ children }) => {
   const { user } = useSelector((state) => state.user);
@@ -13,8 +18,12 @@ const AdminLayout = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      if (user.isAdmin) {
-      } else {
+      const isSuper =
+        user.email &&
+        SUPER_ADMIN_EMAILS.some(
+          (em) => em.toLowerCase() === user.email.toLowerCase()
+        );
+      if (!user.isAdmin && !isSuper) {
         navigate("/user-dashboard");
       }
     }
@@ -43,11 +52,9 @@ const AdminLayout = ({ children }) => {
           <span>© Zelan Store</span>
         </div>
       </footer>
-
-      {/* Mobile Sticky Bottom Navigation Menu */}
-      <AdminMobileBottomNav onOpenMenu={() => setMenu(true)} />
     </div>
   );
 };
 
 export default AdminLayout;
+
