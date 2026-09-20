@@ -45,7 +45,15 @@ const AdminHeader = ({ onToggleMenu }) => {
   return (
     <header className="admin-header-main">
       <div className="admin-brand" onClick={() => navigate("/admin-dashboard")}>
-        <img src="/logo192.png" alt="Zelan Store" className="admin-brand-logo" />
+        <img
+          src="/logo.png"
+          alt="Zelan Store"
+          className="admin-brand-logo"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = "/android-chrome-192x192.png";
+          }}
+        />
         <h1 className="admin-brand-title">Zelan Admin</h1>
         <span className="admin-badge-pill">
           <AdminPanelSettingsIcon style={{ fontSize: "14px", verticalAlign: "-2px", marginRight: "4px" }} />

@@ -37,9 +37,20 @@ const AdminSidemenu = ({ menu, setMenu }) => {
   return (
     <div className={`admin-sidemenu-container ${menu ? "active" : ""}`}>
       <div className="w-100 d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-        <span className="fw-bold" style={{ color: "var(--p)", fontSize: "1.1rem" }}>
-          Admin Navigation
-        </span>
+        <div className="d-flex align-items-center gap-2">
+          <img
+            src="/logo.png"
+            alt="Zelan Store"
+            style={{ width: "32px", height: "32px", borderRadius: "8px", objectFit: "cover" }}
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = "/android-chrome-192x192.png";
+            }}
+          />
+          <span className="fw-bold" style={{ color: "var(--p)", fontSize: "1.1rem" }}>
+            Zelan Admin
+          </span>
+        </div>
         <CancelIcon
           onClick={() => setMenu(false)}
           className="cancel-icon"
